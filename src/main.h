@@ -37,6 +37,7 @@ typedef struct pile {
     int id;
 } pile;
 
+//Define a struct that contains a pointer to a "card" struct, and pointers to the next and previous nodes in a deck
 typedef struct node {
     struct card *assigned_card;
     struct node *next;
