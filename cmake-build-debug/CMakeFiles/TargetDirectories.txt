@@ -1,3 +1,3 @@
-/Users/Amira/CLionProjects/Solitaire/cmake-build-debug/CMakeFiles/Solitaire.dir
-/Users/Amira/CLionProjects/Solitaire/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/Amira/CLionProjects/Solitaire/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/Amira/Documents/GitHub/02322YukonSolitaire/cmake-build-debug/CMakeFiles/Solitaire.dir
+/Users/Amira/Documents/GitHub/02322YukonSolitaire/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/Amira/Documents/GitHub/02322YukonSolitaire/cmake-build-debug/CMakeFiles/rebuild_cache.dir
