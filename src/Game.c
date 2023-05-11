@@ -229,7 +229,6 @@ struct deck* splitShuffle(struct deck* deck) {
 // Define a function that takes in a pointer to a deck struct and returns a pointer to a deck struct
 struct deck *randomshuffle_deck(struct deck *deck) {
 
-
     int i, j;
 
 // Set the seed for the random number generator
@@ -553,6 +552,7 @@ pile *initializePiles(deck *Deck) {
     // Return the head of the pile linked list
     return head_of_pile;
 }
+
 // Function to display the current state of the card piles and foundations
 void displayCardPiles(pile *head_of_pile, card *Foundations[]) {
 // Initialize variables
@@ -840,6 +840,8 @@ int main(int argc, char *argv[]) {
         }
 
     }
-
     return 0;
 }
+
+
+
