@@ -1,0 +1,3 @@
+C:/Users/aljwa/CLionProjects/Solitaire/cmake-build-debug-coverage/CMakeFiles/Solitaire.dir
+C:/Users/aljwa/CLionProjects/Solitaire/cmake-build-debug-coverage/CMakeFiles/edit_cache.dir
+C:/Users/aljwa/CLionProjects/Solitaire/cmake-build-debug-coverage/CMakeFiles/rebuild_cache.dir

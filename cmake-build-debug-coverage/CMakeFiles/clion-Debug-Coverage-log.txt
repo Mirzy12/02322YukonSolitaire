@@ -1,0 +1,4 @@
+C:\Users\aljwa\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\223.8836.42\bin\cmake\win\x64\bin\cmake.exe -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS=--coverage -DCMAKE_C_FLAGS=--coverage -G "CodeBlocks - MinGW Makefiles" -S C:\Users\aljwa\CLionProjects\Solitaire -B C:\Users\aljwa\CLionProjects\Solitaire\cmake-build-debug-coverage
+-- Configuring done
+-- Generating done
+-- Build files have been written to: C:/Users/aljwa/CLionProjects/Solitaire/cmake-build-debug-coverage
