@@ -7,7 +7,6 @@
 #include <string.h>
 
 
-
 // Define number of suits, values and columns using preprocessor directives
 #define NUM_SUITS 4
 #define NUM_VALUES 13
@@ -29,7 +28,7 @@ card *new_card(char suit, char value) {
 }
 
 node *new_node(card *someCard) {
-    struct node *newNode = malloc(sizeof (struct node));
+    struct node *newNode = malloc(sizeof(struct node));
     newNode->assigned_card = someCard;
     newNode->next = NULL;
     newNode->prev = NULL;
@@ -47,7 +46,7 @@ deck *new_deck() {
 }
 
 pile *new_pile() {
-    pile *pile1 = malloc(sizeof (pile));
+    pile *pile1 = malloc(sizeof(pile));
     pile1->head = NULL;
     pile1->tail = NULL;
     pile1->next = NULL;
@@ -180,17 +179,17 @@ void printInitalSetup() {
     puts("\n");
 }
 
-struct deck* splitShuffle(struct deck* deck) {
+struct deck *splitShuffle(struct deck *deck) {
     // Allocate memory for the shuffled deck
-    struct deck* shuffledDeck = malloc(sizeof(struct deck));
+    struct deck *shuffledDeck = malloc(sizeof(struct deck));
     shuffledDeck->head = NULL;
     shuffledDeck->tail = NULL;
     shuffledDeck->size = 0;
 
     // Split the deck into two halves
-    struct card* firstHalf = deck->head;
-    struct card* secondHalf = NULL;
-    struct card* current = deck->head;
+    struct card *firstHalf = deck->head;
+    struct card *secondHalf = NULL;
+    struct card *current = deck->head;
 
     int i;
     for (i = 0; i < deck->size / 2; i++) {
@@ -201,29 +200,28 @@ struct deck* splitShuffle(struct deck* deck) {
     // Interleave the cards from the two halves
     for (i = 0; i < deck->size / 2; i++) {
         // Take the i-th card from the first half
-        struct card* firstCard = firstHalf;
+        struct card *firstCard = firstHalf;
         int j;
         for (j = 0; j < i; j++) {
             firstCard = firstCard->next;
         }
 
         // Take the i-th card from the second half
-        struct card* secondCard = secondHalf;
+        struct card *secondCard = secondHalf;
         for (j = 0; j < i; j++) {
             secondCard = secondCard->next;
         }
 
         // Add the two cards to the shuffled deck
-        struct card* newCard1 = new_card(firstCard->suit, firstCard->value);
+        struct card *newCard1 = new_card(firstCard->suit, firstCard->value);
         attachCardToDeck(shuffledDeck, newCard1);
 
-        struct card* newCard2 = new_card(secondCard->suit, secondCard->value);
+        struct card *newCard2 = new_card(secondCard->suit, secondCard->value);
         attachCardToDeck(shuffledDeck, newCard2);
     }
 
     return shuffledDeck;
 }
-
 
 
 // Define a function that takes in a pointer to a deck struct and returns a pointer to a deck struct
@@ -285,7 +283,7 @@ card *moveCardToFoundation(pile *head, int source_column) {
 
     pile *current = head;
 
-    while(current->id != source_column) {
+    while (current->id != source_column) {
         current = current->next;
     }
 
@@ -325,7 +323,7 @@ void moveCard(pile *head, int source_column, int target_column) {
     pile *source_pile;
     pile *target_pile;
 
-    while(current->id != source_column) {
+    while (current->id != source_column) {
         current = current->next;
     }
     source_pile = current;
@@ -347,7 +345,7 @@ void moveCard(pile *head, int source_column, int target_column) {
     }
 
     current = head;
-    while(current->id != target_column) {
+    while (current->id != target_column) {
         current = current->next;
     }
 
@@ -373,7 +371,7 @@ void moveCard(pile *head, int source_column, int target_column) {
 
     node *current_node = source_pile->head;
     int temp_length = 0;
-    while(current_node != NULL) {
+    while (current_node != NULL) {
         current_node = current_node->next;
         temp_length++;
     }
@@ -381,7 +379,7 @@ void moveCard(pile *head, int source_column, int target_column) {
 
     temp_length = 0;
     current_node = target_pile->head;
-    while(current_node != NULL) {
+    while (current_node != NULL) {
         current_node = current_node->next;
         temp_length++;
     }
@@ -405,21 +403,21 @@ void moveSpecificCard(pile *head, int source_column, int target_column, char val
     pile *source_pile;
     pile *target_pile;
 
-    while(current->id != source_column) {
+    while (current->id != source_column) {
         current = current->next;
     }
     source_pile = current;
 
     // Find the last card in the source column
     node *source_card = current->head;
-    while(source_card != NULL) {
-        if(source_card->assigned_card->value == value && source_card->assigned_card->suit == suit) {
+    while (source_card != NULL) {
+        if (source_card->assigned_card->value == value && source_card->assigned_card->suit == suit) {
             break;
         }
         source_card = source_card->next;
     }
 
-    if(source_card == NULL) {
+    if (source_card == NULL) {
         printf("ERROR\n");
         return;
     }
@@ -435,7 +433,7 @@ void moveSpecificCard(pile *head, int source_column, int target_column, char val
     }
 
     current = head;
-    while(current->id != target_column) {
+    while (current->id != target_column) {
         current = current->next;
     }
 
@@ -461,7 +459,7 @@ void moveSpecificCard(pile *head, int source_column, int target_column, char val
 
     node *current_node = source_pile->head;
     int temp_length = 0;
-    while(current_node != NULL) {
+    while (current_node != NULL) {
         current_node = current_node->next;
         temp_length++;
     }
@@ -469,7 +467,7 @@ void moveSpecificCard(pile *head, int source_column, int target_column, char val
 
     temp_length = 0;
     current_node = target_pile->head;
-    while(current_node != NULL) {
+    while (current_node != NULL) {
         current_node = current_node->next;
         temp_length++;
     }
@@ -486,10 +484,10 @@ pile *initializePiles(deck *Deck) {
     card *current_card = Deck->head; // initialize the current card to the first card of the deck
 
     //Loop through NUM_COLUMNS (7) times to fill in each pile with cards
-    for(int i = 0; i < NUM_COLUMNS; i++) {
+    for (int i = 0; i < NUM_COLUMNS; i++) {
         current_pile->id = i; // assign a unique id to each pile
         current_pile->head = new_node(current_card); // create a new node for each card
-        if(i != 0) {
+        if (i != 0) {
             current_card->cardVisible = false; // hide the card on the first pile
         } else {
             current_card->cardVisible = true;
@@ -505,10 +503,10 @@ pile *initializePiles(deck *Deck) {
     current_pile = head_of_pile;
 
     // Loop through remaining cards and add to the piles based on game rules
-    while(current_card != NULL) {
+    while (current_card != NULL) {
         // If the current pile is the first pile and has only 1 card or if
         // it has reached the maximum number of cards allowed, move to next pile
-        if(current_pile->id == 0) {
+        if (current_pile->id == 0) {
             current_pile = head_of_pile;
         }
         if ((current_pile->id == 0 && current_pile->length == 1) ||
@@ -533,12 +531,12 @@ pile *initializePiles(deck *Deck) {
         current_pile->length = ++temp_length;
 
         // Set visibility of card based on game rules
-        if((current_pile->id == 1 && current_pile->length <= 1) ||
-           (current_pile->id == 2 && current_pile->length <= 2) ||
-           (current_pile->id == 3 && current_pile->length <= 3) ||
-           (current_pile->id == 4 && current_pile->length <= 4) ||
-           (current_pile->id == 5 && current_pile->length <= 5) ||
-           (current_pile->id == 6 && current_pile->length <= 6)){
+        if ((current_pile->id == 1 && current_pile->length <= 1) ||
+            (current_pile->id == 2 && current_pile->length <= 2) ||
+            (current_pile->id == 3 && current_pile->length <= 3) ||
+            (current_pile->id == 4 && current_pile->length <= 4) ||
+            (current_pile->id == 5 && current_pile->length <= 5) ||
+            (current_pile->id == 6 && current_pile->length <= 6)) {
             current_card->cardVisible = false;
         } else {
             current_card->cardVisible = true;
@@ -565,9 +563,9 @@ void displayCardPiles(pile *head_of_pile, card *Foundations[]) {
     node *current_card_in_pile[10];
 
 // Iterate through each pile to determine the longest pile and its ID
-    while(current_pile != NULL) {
+    while (current_pile != NULL) {
         current_card_in_pile[index] = current_pile->head;
-        if(longest_pile <= current_pile->length) {
+        if (longest_pile <= current_pile->length) {
             longest_pile = current_pile->length;
             id_of_longest_pile = current_pile->id;
         }
@@ -576,7 +574,7 @@ void displayCardPiles(pile *head_of_pile, card *Foundations[]) {
     }
 
 // If the longest pile is less than 8, set it to 8
-    if(longest_pile < 8) {
+    if (longest_pile < 8) {
         longest_pile = 8;
     }
 
@@ -587,16 +585,16 @@ void displayCardPiles(pile *head_of_pile, card *Foundations[]) {
     card *current_card;
 
 // Loop through each row of cards and display their values, or an empty space if there is no card
-    while(longest_pile != 0) {
-        if(current_card_in_pile[current_id] == NULL) {
+    while (longest_pile != 0) {
+        if (current_card_in_pile[current_id] == NULL) {
             current_card = NULL;
         } else {
             current_card = current_card_in_pile[current_id]->assigned_card;
         }
 
-        if(current_card != NULL && current_card->cardVisible) {
+        if (current_card != NULL && current_card->cardVisible) {
             printf("%c%c\t", current_card->value, current_card->suit);
-        } else if(current_card != NULL && !current_card->cardVisible){
+        } else if (current_card != NULL && !current_card->cardVisible) {
             printf("[]\t");
         } else {
             printf("\t");
@@ -605,10 +603,10 @@ void displayCardPiles(pile *head_of_pile, card *Foundations[]) {
         // If the current card is the last card in a pile and it is a foundation pile, display the foundation
         if (current_id == 6) {
             if (foundations % 2 == 0 && index < 4) {
-                if(Foundations[index] != NULL) {
-                    printf("\t\t%c%c\tF%d", Foundations[index]->value, Foundations[index]->suit, index+1);
+                if (Foundations[index] != NULL) {
+                    printf("\t\t%c%c\tF%d", Foundations[index]->value, Foundations[index]->suit, index + 1);
                 } else {
-                    printf("\t\t[]\tF%d", index+1);
+                    printf("\t\t[]\tF%d", index + 1);
                 }
                 index++;
             }
@@ -617,18 +615,18 @@ void displayCardPiles(pile *head_of_pile, card *Foundations[]) {
         }
 
         // Decrement the longest pile variable if the current card is the last card in the longest pile
-        if(id_of_longest_pile == current_id) {
+        if (id_of_longest_pile == current_id) {
             longest_pile--;
         }
 
         // Move to the next card in the current pile
-        if(current_card_in_pile[current_id] == NULL){
+        if (current_card_in_pile[current_id] == NULL) {
             current_card_in_pile[current_id] = NULL;
         } else {
             current_card_in_pile[current_id] = current_card_in_pile[current_id]->next;
         }
         // Move to the next pile if at the end of the current row, otherwise move to the next card in the row
-        if(current_id == 6) {
+        if (current_id == 6) {
             current_id = 0;
         } else {
             current_id += 1;
@@ -637,6 +635,7 @@ void displayCardPiles(pile *head_of_pile, card *Foundations[]) {
 // Print a newline character to separate the output from other text
     puts("\n");
 }
+
 // This function saves the cards in a deck to a file in a specific format
 void SaveDeckCards(pile *head_of_pile) {
     pile *current_pile = head_of_pile; // pointer to the current pile being processed
@@ -650,9 +649,9 @@ void SaveDeckCards(pile *head_of_pile) {
 
 
     // Loop through all piles to find the longest one and populate the array of current cards in each pile
-    while(current_pile != NULL) {
+    while (current_pile != NULL) {
         current_card_in_pile[index] = current_pile->head; // store a pointer to the head node of the current pile
-        if(longest_pile <= current_pile->length) { // check if the current pile is longer than the longest pile so far
+        if (longest_pile <= current_pile->length) { // check if the current pile is longer than the longest pile so far
             longest_pile = current_pile->length; // if it is, update the longest_pile variable
             id_of_longest_pile = current_pile->id; // and store the id of the current pile as the id of the pile with the most cards
         }
@@ -661,7 +660,7 @@ void SaveDeckCards(pile *head_of_pile) {
     }
 
     // If the longest pile has less than 8 cards, set its length to 8
-    if(longest_pile < 8) {
+    if (longest_pile < 8) {
         longest_pile = 8;
     }
 
@@ -677,19 +676,19 @@ void SaveDeckCards(pile *head_of_pile) {
     bool notFirstLine = false;
 
     // Loop through the cards in the deck
-    while(longest_pile != 0) {
+    while (longest_pile != 0) {
         // Get the card at the current position
-        if(current_card_in_pile[current_id] == NULL) { // if the current node is NULL, set the current card to NULL
+        if (current_card_in_pile[current_id] == NULL) { // if the current node is NULL, set the current card to NULL
             current_card = NULL;
         } else {
             current_card = current_card_in_pile[current_id]->assigned_card; // otherwise, get the card assigned to the current node
         }
 
         // If there is a current card, save it to the file
-        if(current_card != NULL) {
+        if (current_card != NULL) {
             newData[0] = current_card->value; // copy the card value to newData
             newData[1] = current_card->suit; // copy the card suit to newData
-            if(notFirstLine) { // if this is not the first line of the file, add a newline character before writing the data
+            if (notFirstLine) { // if this is not the first line of the file, add a newline character before writing the data
                 fprintf(stream, "\n");
             }
             notFirstLine = true; // set the notFirstLine flag to true
@@ -697,18 +696,18 @@ void SaveDeckCards(pile *head_of_pile) {
         }
 
         // If the current pile is the longest pile, decrement longest_pile
-        if(id_of_longest_pile == current_id) {
+        if (id_of_longest_pile == current_id) {
             longest_pile--;
         }
 
         // Move to the next card in the current pile
-        if(current_card_in_pile[current_id] == NULL){
+        if (current_card_in_pile[current_id] == NULL) {
             current_card_in_pile[current_id] = NULL;
         } else {
             current_card_in_pile[current_id] = current_card_in_pile[current_id]->next;
         }
         //The code then checks whether the current_id is equal to 6, which is the maximum index for the current_card_in_pile array
-        if(current_id == 6) {
+        if (current_id == 6) {
             //Index is reset to 0 to start at the beginning of the array again.
             current_id = 0;
             //Index is incremented by 1 to move to the next pile in the array
@@ -728,9 +727,9 @@ bool checkWinState(pile *head) {
     pile *current = head;
 
 // Iterate through each pile in the linked list.
-    while(current != NULL) {
+    while (current != NULL) {
         // If the head node of the current pile is not empty,the game has not been won, so return false.
-        if(current->head != NULL) {
+        if (current->head != NULL) {
             return false;
         }
         // Move to the next pile in the linked list.
@@ -742,10 +741,107 @@ bool checkWinState(pile *head) {
 }
 
 
+//This our main that run our Game.
+int main(int argc, char *argv[]) {
+    // Create a deck of cards
+    card *Foundation[5];
+
+    for (int i = 0; i <= 4; i++) {
+        Foundation[i] = NULL;
+    }
+
+    deck *Deck = new_deck();
+
+    LD_default(Deck);
+
+    printInitalSetup();
+    pile *head_of_pile = initializePiles(Deck);
+    char LastCommand[100] = "";
+    char Message[100] = "";
+    int sourceColumn;
+    int targetColumn;
+    char cardValue;
+    char cardSuit;
+
+    //While loop of the main game, commands and last commands that are saved:
+    while (1) {
+        char input[50];
+        printf("LAST Command: %s\n", LastCommand);
+        printf("Message: %s\n", Message);
+        printf("INPUT> ");
+        scanf("%s", input);
+
+        strcpy(LastCommand, input);
+
+        if (strcmp(input, " ") == 0) {
+
+        } else if (strcmp(input, "P") == 0) {
+            displayCardPiles(head_of_pile, Foundation);
+        } else if (strcmp(input, "Q") == 0) {
+            deck *Deck = LD(LOADFILE);
+            print_cards_in_deck(Deck);
+        } else if (strcmp(input, "LD") == 0) {
+            deck *Deck = LD(LOADFILE);
+            print_cards_in_deck(Deck);
+            head_of_pile = initializePiles(Deck);
+        } else if (strcmp(input, "SW") == 0) {
+            showAllCards(Deck);
+        } else if (strcmp(input, "SI") == 0) {
+            Deck = splitShuffle(Deck);
+            print_cards_in_deck(Deck);
+        } else if (strcmp(input, "SR") == 0) {
+            Deck = randomshuffle_deck(Deck);
+            showAllCards(Deck);
+        } else if (strcmp(input, "SD") == 0) {
+            SaveDeckCards(head_of_pile);
+            printf("Save\n");
+        } else if (strstr(input, ":") != 0) {
+            cardValue = input[0];
+            cardSuit = input[1];
+            sourceColumn = input[4] - '0';
+            targetColumn = input[8] - '0';
+            sourceColumn = sourceColumn - 1;
+            targetColumn = targetColumn - 1;
+            moveSpecificCard(head_of_pile, sourceColumn, targetColumn, cardValue, cardSuit);
+        } else if (strstr(input, "->") != 0) {
+            sourceColumn = input[1] - '0';
+            targetColumn = input[5] - '0';
+
+            sourceColumn = sourceColumn - 1;
+            targetColumn = targetColumn - 1;
+
+            if (strstr(input, "F1") != 0) {
+                Foundation[0] = moveCardToFoundation(head_of_pile, sourceColumn);
+            } else if (strstr(input, "F2") != 0) {
+                Foundation[1] = moveCardToFoundation(head_of_pile, sourceColumn);
+            } else if (strstr(input, "F3") != 0) {
+                Foundation[2] = moveCardToFoundation(head_of_pile, sourceColumn);
+            } else if (strstr(input, "F4") != 0) {
+                Foundation[3] = moveCardToFoundation(head_of_pile, sourceColumn);
+            } else {
+                moveCard(head_of_pile, sourceColumn, targetColumn);
+            }
+
+            if (checkWinState(head_of_pile)) {
+                printf("Winner Winner, Chicken Dinner!\n");
+                break;
+            }
+        } else if (strcmp(input, "QQ") == 0) {
+            printf("BYE BYE BYE!\n");
+            break;
+        } else if (strcmp(input, "W") == 0) {
+            printf("Winner Winner, Chicken Dinner!\n");
+            break;
+        }
+
+    }
+    return 0;
+}
 
 
 
 
+/*
 //This our main that run our Game.
 int main(int argc, char *argv[]) {
     // Create a deck of cards
@@ -842,6 +938,6 @@ int main(int argc, char *argv[]) {
     }
     return 0;
 }
-
+*/
 
 
