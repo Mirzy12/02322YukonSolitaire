@@ -773,28 +773,33 @@ int main(int argc, char *argv[]) {
 
         strcpy(LastCommand, input);
 
-        if (strcmp(input, " ") == 0) {
-
-        } else if (strcmp(input, "P") == 0) {
+        if (strcmp(input, "P") == 0) {
             displayCardPiles(head_of_pile, Foundation);
+            strcpy(Message, "OK");
         } else if (strcmp(input, "Q") == 0) {
             deck *Deck = LD(LOADFILE);
             print_cards_in_deck(Deck);
+            strcpy(Message, "OK");
         } else if (strcmp(input, "LD") == 0) {
             deck *Deck = LD(LOADFILE);
             print_cards_in_deck(Deck);
             head_of_pile = initializePiles(Deck);
+            strcpy(Message, "OK");
         } else if (strcmp(input, "SW") == 0) {
             showAllCards(Deck);
+            strcpy(Message, "OK");
         } else if (strcmp(input, "SI") == 0) {
             Deck = splitShuffle(Deck);
             print_cards_in_deck(Deck);
+            strcpy(Message, "OK");
         } else if (strcmp(input, "SR") == 0) {
             Deck = randomshuffle_deck(Deck);
             showAllCards(Deck);
+            strcpy(Message, "OK");
         } else if (strcmp(input, "SD") == 0) {
             SaveDeckCards(head_of_pile);
             printf("Save\n");
+            strcpy(Message, "OK");
         } else if (strstr(input, ":") != 0) {
             cardValue = input[0];
             cardSuit = input[1];
@@ -803,6 +808,7 @@ int main(int argc, char *argv[]) {
             sourceColumn = sourceColumn - 1;
             targetColumn = targetColumn - 1;
             moveSpecificCard(head_of_pile, sourceColumn, targetColumn, cardValue, cardSuit);
+            strcpy(Message, "OK");
         } else if (strstr(input, "->") != 0) {
             sourceColumn = input[1] - '0';
             targetColumn = input[5] - '0';
@@ -826,118 +832,19 @@ int main(int argc, char *argv[]) {
                 printf("Winner Winner, Chicken Dinner!\n");
                 break;
             }
+
+            strcpy(Message, "OK");
         } else if (strcmp(input, "QQ") == 0) {
             printf("BYE BYE BYE!\n");
             break;
         } else if (strcmp(input, "W") == 0) {
             printf("Winner Winner, Chicken Dinner!\n");
             break;
+        } else {
+            strcpy(Message, "ERROR");
         }
-
     }
     return 0;
 }
-
-
-
-
-/*
-//This our main that run our Game.
-int main(int argc, char *argv[]) {
-    // Create a deck of cards
-    card *Foundation[5];
-
-    for (int i = 0; i <= 4; i++) {
-        Foundation[i] = NULL;
-    }
-
-    deck *Deck = new_deck();
-
-    LD_default(Deck);
-
-    printInitalSetup();
-    pile *head_of_pile = initializePiles(Deck);
-    char LastCommand[100] = "";
-    char Message[100] = "";
-    int sourceColumn;
-    int targetColumn;
-    char cardValue;
-    char cardSuit;
-
-    //While loop of the main game, commands and last commands that are saved:
-    while (1) {
-        char input[50];
-        printf("LAST Command: %s\n", LastCommand);
-        printf("Message: %s\n", Message);
-        printf("INPUT> ");
-        scanf("%s", input);
-
-        strcpy(LastCommand, input);
-
-        if (strcmp(input, " ") == 0) {
-
-        } else if (strcmp(input, "P") == 0) {
-            displayCardPiles(head_of_pile, Foundation);
-        } else if (strcmp(input, "Q") == 0) {
-            deck *Deck = LD(LOADFILE);
-            print_cards_in_deck(Deck);
-        } else if (strcmp(input, "LD") == 0) {
-            deck *Deck = LD(LOADFILE);
-            print_cards_in_deck(Deck);
-            head_of_pile = initializePiles(Deck);
-        } else if (strcmp(input, "SW") == 0) {
-            showAllCards(Deck);
-        } else if (strcmp(input, "SI") == 0) {
-            Deck = splitShuffle(Deck);
-            print_cards_in_deck(Deck);
-        } else if (strcmp(input, "SR") == 0) {
-            Deck = randomshuffle_deck(Deck);
-            showAllCards(Deck);
-        } else if (strcmp(input, "SD") == 0) {
-            SaveDeckCards(head_of_pile);
-            printf("Save\n");
-        } else if(strstr(input, ":") != 0){
-            cardValue = input[0];
-            cardSuit = input[1];
-            sourceColumn = input[4] - '0';
-            targetColumn = input[8] - '0';
-            sourceColumn = sourceColumn - 1;
-            targetColumn = targetColumn - 1;
-            moveSpecificCard(head_of_pile, sourceColumn, targetColumn, cardValue, cardSuit);
-        } else if(strstr(input, "->") != 0) {
-            sourceColumn = input[1] - '0';
-            targetColumn = input[5] - '0';
-
-            sourceColumn = sourceColumn - 1;
-            targetColumn = targetColumn - 1;
-
-            if(strstr(input, "F1") != 0){
-                Foundation[0] = moveCardToFoundation(head_of_pile, sourceColumn);
-            } else if(strstr(input, "F2") != 0) {
-                Foundation[1] = moveCardToFoundation(head_of_pile, sourceColumn);
-            } else if(strstr(input, "F3") != 0) {
-                Foundation[2] = moveCardToFoundation(head_of_pile, sourceColumn);
-            } else if(strstr(input, "F4") != 0) {
-                Foundation[3] = moveCardToFoundation(head_of_pile, sourceColumn);
-            } else {
-                moveCard(head_of_pile, sourceColumn, targetColumn);
-            }
-
-            if(checkWinState(head_of_pile)) {
-                printf("Winner Winner, Chicken Dinner!\n");
-                break;
-            }
-        } else if (strcmp(input, "QQ") == 0) {
-            printf("BYE BYE BYE!\n");
-            break;
-        } else if(strcmp(input, "W") == 0) {
-            printf("Winner Winner, Chicken Dinner!\n");
-            break;
-        }
-
-    }
-    return 0;
-}
-*/
 
 
