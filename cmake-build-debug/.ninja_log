@@ -1,6 +1,5 @@
 # ninja log v5
-4	310	1683778064566388198	build.ninja	dca4db810d834ffa
+4	310	1708533355953689310	build.ninja	dca4db810d834ffa
 1850	2200	1683776115429467845	Solitaire	bb45df6addd5ac8a
-2	1611	1683770328475121429	CMakeFiles/Solitaire.dir/src/Deck.c.o	1ccd939ac4c61d1d
 9	2037	1683774886848608014	CMakeFiles/Solitaire.dir/src/LD.c.o	8ef21fc297146a37
 11	1850	1683776115064631631	CMakeFiles/Solitaire.dir/src/Game.c.o	6024aa39b7afe1a3

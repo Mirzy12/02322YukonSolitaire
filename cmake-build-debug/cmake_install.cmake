@@ -1,4 +1,4 @@
-# Install script for directory: /Users/Amira/Documents/GitHub/02322YukonSolitaire
+# Install script for directory: /Users/Amira/Downloads/02322YukonSolitaire 2
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/Amira/Documents/GitHub/02322YukonSolitaire/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/Amira/Downloads/02322YukonSolitaire 2/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
