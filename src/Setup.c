@@ -74,7 +74,7 @@ struct card *splitShuffle(struct deck *deck) {
     }
     secondHalf = current;
 
-    // Interleave the cards from the two halves
+    // Interleaving the cards from the two halves
     for (i = 0; i < deck->size / 2; i++) {
         // Take the i-th card from the first half
         struct card *firstCard = firstHalf;
