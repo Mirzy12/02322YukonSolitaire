@@ -1,4 +1,4 @@
-"/Users/Amira/Library/Application Support/JetBrains/Toolbox/apps/CLion/ch-0/231.8770.66/CLion.app/Contents/bin/cmake/mac/bin/cmake" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=/Users/Amira/Library/Application Support/JetBrains/Toolbox/apps/CLion/ch-0/231.8770.66/CLion.app/Contents/bin/ninja/mac/ninja" -G Ninja -S /Users/Amira/Documents/GitHub/02322YukonSolitaire -B /Users/Amira/Documents/GitHub/02322YukonSolitaire/cmake-build-debug
--- Configuring done
--- Generating done
--- Build files have been written to: /Users/Amira/Documents/GitHub/02322YukonSolitaire/cmake-build-debug
+"/Users/Amira/Library/Application Support/JetBrains/Toolbox/apps/CLion/ch-0/241.15989.121/CLion.app/Contents/bin/cmake/mac/x64/bin/cmake" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=/Users/Amira/Library/Application Support/JetBrains/Toolbox/apps/CLion/ch-0/241.15989.121/CLion.app/Contents/bin/ninja/mac/x64/ninja" -G Ninja -S "/Users/Amira/Downloads/02322YukonSolitaire 2" -B "/Users/Amira/Downloads/02322YukonSolitaire 2/cmake-build-debug"
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: /Users/Amira/Downloads/02322YukonSolitaire 2/cmake-build-debug

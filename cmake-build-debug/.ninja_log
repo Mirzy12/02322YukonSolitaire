@@ -1,6 +1,8 @@
 # ninja log v5
-4	310	1683778064566388198	build.ninja	dca4db810d834ffa
-1850	2200	1683776115429467845	Solitaire	bb45df6addd5ac8a
-2	1611	1683770328475121429	CMakeFiles/Solitaire.dir/src/Deck.c.o	1ccd939ac4c61d1d
-9	2037	1683774886848608014	CMakeFiles/Solitaire.dir/src/LD.c.o	8ef21fc297146a37
-11	1850	1683776115064631631	CMakeFiles/Solitaire.dir/src/Game.c.o	6024aa39b7afe1a3
+4	310	1715018740476395714	build.ninja	dca4db810d834ffa
+576	757	1715017166559440958	Solitaire	7f60a3f8f64fd20a
+12	431	1715017166228721405	CMakeFiles/Solitaire.dir/src/Display.c.o	5fcbf7c6d783da84
+15	434	1715017166228964560	CMakeFiles/Solitaire.dir/src/LoadGame.c.o	f95cec874f53502b
+432	576	1715017166376412182	CMakeFiles/Solitaire.dir/src/main.c.o	7ff527a14c36c9d4
+17	437	1715017166228828874	CMakeFiles/Solitaire.dir/src/gamePlay.c.o	92d1ad4da10a0ec0
+434	568	1715017166367964567	CMakeFiles/Solitaire.dir/src/Setup.c.o	857cc2a87a93d90b
