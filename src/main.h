@@ -1,5 +1,5 @@
 //
-// Created by HP on 09-05-2023.
+// Created by aljwa on 03-04-2024.
 //
 
 #ifndef SOLITAIRE_MAIN_H
@@ -9,6 +9,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+
+#define NUM_SUITS 4
+#define NUM_VALUES 13
+#define LOADFILE "../cards.txt"
+#define NUM_COLUMNS 7
+
+extern char Message[100];
 
 // Define a struct to represent a card
 typedef struct card {
@@ -46,7 +54,11 @@ typedef struct node {
 
 card *new_card(char suit, char value);
 void attachCardToDeck(deck *deck, card *new_card);
-void LD_default(deck*);
 deck *new_deck();
-void save_deck(deck *deck, char *filename);
+pile *new_pile();
+node *new_node(card *someCard);
+void updateMessage(char *Message, const char *newMessage);
+
+
+
 #endif //SOLITAIRE_MAIN_H
