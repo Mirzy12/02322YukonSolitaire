@@ -7,13 +7,14 @@
 #include <string.h>
 
 
-
-// Define number of suits, values and columns using preprocessor directives
+// Define number of suits, values and columns using directives
 #define NUM_SUITS 4
 #define NUM_VALUES 13
-#define LOADFILE "../cards.txt"
+// If running on another machine, do update LOADFILE to the correct path.
+#define LOADFILE "/Users/Amira/CLionProjects/02322YukonSolitaire/cards.txt"
 #define NUM_COLUMNS 7
 
+typedef enum { StartUp, Play } Phase;
 // Function to create a new card and insert into linked list
 card *new_card(char suit, char value) {
     // Allocate memory for a new card and initialize its properties
@@ -723,52 +724,43 @@ void SaveDeckCards(pile *head_of_pile) {
 
 // This function checks if all piles in the linked list have an empty head node, indicating that the game has been won.
 
-bool checkWinState(pile *head) {
-// Start at the beginning of the linked list.
+bool checkWinState(pile *head, char *Message) {
     pile *current = head;
 
-// Iterate through each pile in the linked list.
+    // Check each pile for remaining cards
     while(current != NULL) {
-        // If the head node of the current pile is not empty,the game has not been won, so return false.
         if(current->head != NULL) {
-            return false;
+            return false; // Not won yet
         }
-        // Move to the next pile in the linked list.
         current = current->next;
     }
 
-// If we reach the end of the linked list without finding a non-empty head node, the game has been won, so return true.
+    // All piles are empty, player has won
+    strcpy(Message, "You have won the game!");
     return true;
 }
 
-
-
-
-
-
 //This our main that run our Game.
 int main(int argc, char *argv[]) {
-    // Create a deck of cards
     card *Foundation[5];
-
     for (int i = 0; i <= 4; i++) {
         Foundation[i] = NULL;
     }
 
     deck *Deck = new_deck();
-
     LD_default(Deck);
 
     printInitalSetup();
     pile *head_of_pile = initializePiles(Deck);
+
     char LastCommand[100] = "";
     char Message[100] = "";
     int sourceColumn;
     int targetColumn;
     char cardValue;
     char cardSuit;
+    Phase current_phase = StartUp;
 
-    //While loop of the main game, commands and last commands that are saved:
     while (1) {
         char input[50];
         printf("LAST Command: %s\n", LastCommand);
@@ -781,67 +773,133 @@ int main(int argc, char *argv[]) {
         if (strcmp(input, " ") == 0) {
 
         } else if (strcmp(input, "P") == 0) {
-            displayCardPiles(head_of_pile, Foundation);
-        } else if (strcmp(input, "Q") == 0) {
-            deck *Deck = LD(LOADFILE);
-            print_cards_in_deck(Deck);
-        } else if (strcmp(input, "LD") == 0) {
-            deck *Deck = LD(LOADFILE);
-            print_cards_in_deck(Deck);
-            head_of_pile = initializePiles(Deck);
-        } else if (strcmp(input, "SW") == 0) {
-            showAllCards(Deck);
-        } else if (strcmp(input, "SI") == 0) {
-            Deck = splitShuffle(Deck);
-            print_cards_in_deck(Deck);
-        } else if (strcmp(input, "SR") == 0) {
-            Deck = randomshuffle_deck(Deck);
-            showAllCards(Deck);
-        } else if (strcmp(input, "SD") == 0) {
-            SaveDeckCards(head_of_pile);
-            printf("Save\n");
-        } else if(strstr(input, ":") != 0){
-            cardValue = input[0];
-            cardSuit = input[1];
-            sourceColumn = input[4] - '0';
-            targetColumn = input[8] - '0';
-            sourceColumn = sourceColumn - 1;
-            targetColumn = targetColumn - 1;
-            moveSpecificCard(head_of_pile, sourceColumn, targetColumn, cardValue, cardSuit);
-        } else if(strstr(input, "->") != 0) {
-            sourceColumn = input[1] - '0';
-            targetColumn = input[5] - '0';
-
-            sourceColumn = sourceColumn - 1;
-            targetColumn = targetColumn - 1;
-
-            if(strstr(input, "F1") != 0){
-                Foundation[0] = moveCardToFoundation(head_of_pile, sourceColumn);
-            } else if(strstr(input, "F2") != 0) {
-                Foundation[1] = moveCardToFoundation(head_of_pile, sourceColumn);
-            } else if(strstr(input, "F3") != 0) {
-                Foundation[2] = moveCardToFoundation(head_of_pile, sourceColumn);
-            } else if(strstr(input, "F4") != 0) {
-                Foundation[3] = moveCardToFoundation(head_of_pile, sourceColumn);
+            if (current_phase == Play) {
+                strcpy(Message, "You're already in PLAY phase.");
             } else {
-                moveCard(head_of_pile, sourceColumn, targetColumn);
+                head_of_pile = initializePiles(Deck);
+                displayCardPiles(head_of_pile, Foundation);
+                current_phase = Play;
+                strcpy(Message, "Game has started. You're now in the Play phase.");
             }
-
-            if(checkWinState(head_of_pile)) {
-                printf("Winner Winner, Chicken Dinner!\n");
-                break;
+        } else if (strcmp(input, "Q") == 0) {
+            if (current_phase == StartUp) {
+                strcpy(Message, "You're not in a game.");
+            } else {
+                current_phase = StartUp;
+                strcpy(Message, "Game quit. Now back in StartUp phase.");
+            }
+        } else if (strcmp(input, "LD") == 0) {
+            if (current_phase == Play) {
+                strcpy(Message, "Command not available in the Play phase.");
+            } else {
+                deck *tempDeck = LD(LOADFILE);
+                if (tempDeck == NULL) {
+                    strcpy(Message, "Could not load deck.");
+                } else {
+                    Deck = tempDeck;
+                    print_cards_in_deck(Deck);
+                    strcpy(Message, "Deck loaded from file.");
+                }
+            }
+        } else if (strcmp(input, "SW") == 0) {
+            if (current_phase == Play) {
+                strcpy(Message, "Command not available in the PLAY phase.");
+            } else {
+                showAllCards(Deck);
+                strcpy(Message, "Deck shown.");
+            }
+        } else if (strcmp(input, "SI") == 0) {
+            if (current_phase == Play) {
+                strcpy(Message, "Command not available in the PLAY phase.");
+            } else {
+                Deck = splitShuffle(Deck);
+                print_cards_in_deck(Deck);
+                strcpy(Message, "Deck has been split shuffled.");
+            }
+        } else if (strcmp(input, "SR") == 0) {
+            if (current_phase == Play) {
+                strcpy(Message, "Command not available in the PLAY phase.");
+            } else {
+                Deck = randomshuffle_deck(Deck);
+                showAllCards(Deck);
+                strcpy(Message, "Deck has been randomly shuffled.");
+            }
+        } else if (strcmp(input, "SD") == 0) {
+            if (current_phase == Play) {
+                SaveDeckCards(head_of_pile);
+                strcpy(Message, "Deck has been saved to file.");
+            } else {
+                strcpy(Message, "Command not available in the StartUp phase.");
             }
         } else if (strcmp(input, "QQ") == 0) {
-            printf("BYE BYE BYE!\n");
+            printf("You've successfully quit the game. The program will now exit!\n");
             break;
-        } else if(strcmp(input, "W") == 0) {
-            printf("Winner Winner, Chicken Dinner!\n");
-            break;
-        }
+        } else if (strstr(input, ":") != NULL && strstr(input, "->") != NULL) {
+            // Handle specific move like C7:KS->C1 or C7:KS->F1
+            if (input[0] == 'C' && input[3] == ':' && input[6] == '-' && input[7] == '>' && input[8] == 'C') {
+                sourceColumn = input[1] - '0' - 1;
+                cardValue = input[4];
+                cardSuit = input[5];
+                targetColumn = input[9] - '0' - 1;
+                moveSpecificCard(head_of_pile, sourceColumn, targetColumn, cardValue, cardSuit);
+                strcpy(Message, "Card moved.");
+            } else if (input[0] == 'C' && input[3] == ':' && input[6] == '-' && input[7] == '>' && input[8] == 'F') {
+                sourceColumn = input[1] - '0' - 1;
+                cardValue = input[4];
+                cardSuit = input[5];
+                int foundationIndex = input[9] - '1';
+                Foundation[foundationIndex] = moveCardToFoundation(head_of_pile, sourceColumn);
+                strcpy(Message, "Moved to foundation.");
+            } else {
+                strcpy(Message, "Invalid target in move command.");
+            }
+        } else if (strstr(input, "->") != NULL) {
+            if (input[0] == 'F') {
+                int foundationIndex = input[1] - '1';
+                targetColumn = input[4] - '0' - 1;
+                if (Foundation[foundationIndex] != NULL) {
+                    card *movingCard = Foundation[foundationIndex];
+                    Foundation[foundationIndex] = NULL;
+                    node *newNode = new_node(movingCard);
+                    pile *targetPile = head_of_pile;
+                    for (int i = 0; i < targetColumn; i++) targetPile = targetPile->next;
+                    if (targetPile->tail) {
+                        targetPile->tail->next = newNode;
+                        newNode->prev = targetPile->tail;
+                        targetPile->tail = newNode;
+                    } else {
+                        targetPile->head = targetPile->tail = newNode;
+                    }
+                    targetPile->length++;
+                    strcpy(Message, "Card moved from foundation to column.");
+                } else {
+                    strcpy(Message, "Foundation is empty.");
+                }
+            } else if (input[0] == 'C') {
+                sourceColumn = input[1] - '0' - 1;
+                if (input[3] == 'C') {
+                    targetColumn = input[4] - '0' - 1;
+                    moveCard(head_of_pile, sourceColumn, targetColumn);
+                    strcpy(Message, "Move complete.");
+                } else if (input[3] == 'F') {
+                    int foundationIndex = input[4] - '1';
+                    Foundation[foundationIndex] = moveCardToFoundation(head_of_pile, sourceColumn);
+                    strcpy(Message, "Moved to foundation.");
+                } else {
+                    strcpy(Message, "Invalid destination.");
+                }
+            } else {
+                strcpy(Message, "Invalid move format.");
+            }
 
+            if (checkWinState(head_of_pile, Message)) {
+                printf("Winner!\n");
+                break;
+            }
+        } else {
+            strcpy(Message, "Invalid command.");
+        }
     }
+
     return 0;
 }
-
-
-
