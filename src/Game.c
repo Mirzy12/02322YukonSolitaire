@@ -835,23 +835,23 @@ int main(int argc, char *argv[]) {
             printf("You've successfully quit the game. The program will now exit!\n");
             break;
         } else if (strstr(input, ":") != NULL && strstr(input, "->") != NULL) {
-            // Handle specific move like C7:KS->C1 or C7:KS->F1
-            if (input[0] == 'C' && input[3] == ':' && input[6] == '-' && input[7] == '>' && input[8] == 'C') {
+            if (input[0] == 'C' && input[3] == ':' && input[6] == '-' && input[7] == '>') {
                 sourceColumn = input[1] - '0' - 1;
                 cardValue = input[4];
                 cardSuit = input[5];
-                targetColumn = input[9] - '0' - 1;
-                moveSpecificCard(head_of_pile, sourceColumn, targetColumn, cardValue, cardSuit);
-                strcpy(Message, "Card moved.");
-            } else if (input[0] == 'C' && input[3] == ':' && input[6] == '-' && input[7] == '>' && input[8] == 'F') {
-                sourceColumn = input[1] - '0' - 1;
-                cardValue = input[4];
-                cardSuit = input[5];
-                int foundationIndex = input[9] - '1';
-                Foundation[foundationIndex] = moveCardToFoundation(head_of_pile, sourceColumn);
-                strcpy(Message, "Moved to foundation.");
+                if (input[8] == 'C') {
+                    targetColumn = input[9] - '0' - 1;
+                    moveSpecificCard(head_of_pile, sourceColumn, targetColumn, cardValue, cardSuit);
+                    strcpy(Message, "Card moved.");
+                } else if (input[8] == 'F') {
+                    int foundationIndex = input[9] - '1';
+                    Foundation[foundationIndex] = moveCardToFoundation(head_of_pile, sourceColumn);
+                    strcpy(Message, "Moved to foundation.");
+                } else {
+                    strcpy(Message, "Invalid target in move command.");
+                }
             } else {
-                strcpy(Message, "Invalid target in move command.");
+                strcpy(Message, "Invalid move format.");
             }
         } else if (strstr(input, "->") != NULL) {
             if (input[0] == 'F') {
