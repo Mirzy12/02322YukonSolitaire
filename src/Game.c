@@ -390,91 +390,117 @@ void moveCard(pile *head, int source_column, int target_column) {
 }
 
 void moveSpecificCard(pile *head, int source_column, int target_column, char value, char suit) {
-    // Check that source_column and target_column are valid indices
     if (source_column < 0 || source_column >= NUM_COLUMNS || target_column < 0 || target_column >= NUM_COLUMNS) {
         printf("Invalid column indices.\n");
         return;
     }
 
-    // Check that the source column is not empty
-    if (head == NULL) {
-        printf("Source column is empty.\n");
+    pile *current = head;
+    pile *source_pile = NULL;
+    pile *target_pile = NULL;
+
+    // find source pile
+    while (current != NULL) {
+        if (current->id == source_column) {
+            source_pile = current;
+            break;
+        }
+        current = current->next;
+    }
+
+    if (source_pile == NULL || source_pile->head == NULL) {
+        printf("ERROR: Source empty\n");
         return;
     }
 
-    pile *current = head;
-    pile *source_pile;
-    pile *target_pile;
-
-    while(current->id != source_column) {
+    // find target pile
+    current = head;
+    while (current != NULL) {
+        if (current->id == target_column) {
+            target_pile = current;
+            break;
+        }
         current = current->next;
     }
-    source_pile = current;
 
-    // Find the last card in the source column
-    node *source_card = current->head;
-    while(source_card != NULL) {
-        if(source_card->assigned_card->value == value && source_card->assigned_card->suit == suit) {
+    if (target_pile == NULL) {
+        printf("ERROR: Target not found\n");
+        return;
+    }
+
+    // find the card in source
+    node *source_card = source_pile->head;
+    while (source_card != NULL) {
+        if (source_card->assigned_card->value == value &&
+            source_card->assigned_card->suit == suit) {
             break;
         }
         source_card = source_card->next;
     }
 
-    if(source_card == NULL) {
-        printf("ERROR\n");
+    if (source_card == NULL) {
+        printf("ERROR: Card not found\n");
         return;
     }
 
-    // Remove the card from the source column
-    if (source_card->prev == NULL) {
-        // The source column only had one card
-        current->head = NULL;
-        current->tail = NULL;
+    //  SPLIT LIST
+    node *before = source_card->prev;
+
+    if (before != NULL) {
+        before->next = NULL;
+        source_pile->tail = before;
     } else {
-        source_card->prev->next = NULL;
-        source_card->prev = NULL;
+        // moving whole pile
+        source_pile->head = NULL;
+        source_pile->tail = NULL;
     }
 
-    current = head;
-    while(current->id != target_column) {
-        current = current->next;
-    }
+    source_card->prev = NULL;
 
-    target_pile = current;
-
-    // Add the card to the end of the target column
-    if (target_pile->head == NULL && target_pile->tail == NULL) {
-        // The target column is empty
+    // APPEND TO TARGET
+    if (target_pile->head == NULL) {
         target_pile->head = source_card;
         target_pile->tail = source_card;
-        source_card->prev = NULL;
-    } else {
-        // Find the last card in the target column
-        node *target_tail = target_pile->tail;
-        while (target_tail->next != NULL) {
-            target_tail = target_tail->next;
-        }
 
-        // Add the card to the end of the target column
+        // find new tail
+        node *temp = source_card;
+        while (temp->next != NULL) temp = temp->next;
+        target_pile->tail = temp;
+
+    } else {
+        node *target_tail = target_pile->tail;
+
         target_tail->next = source_card;
         source_card->prev = target_tail;
+
+        // find new tail
+        node *temp = source_card;
+        while (temp->next != NULL) temp = temp->next;
+        target_pile->tail = temp;
     }
 
-    node *current_node = source_pile->head;
-    int temp_length = 0;
-    while(current_node != NULL) {
-        current_node = current_node->next;
-        temp_length++;
+    // FLIP CARD (important!)
+    if (source_pile->tail != NULL &&
+        source_pile->tail->assigned_card->cardVisible == false) {
+        source_pile->tail->assigned_card->cardVisible = true;
     }
-    source_pile->length = temp_length;
 
-    temp_length = 0;
-    current_node = target_pile->head;
-    while(current_node != NULL) {
-        current_node = current_node->next;
-        temp_length++;
+    // UPDATE LENGTHS
+    int count = 0;
+    node *tmp = source_pile->head;
+    while (tmp != NULL) {
+        count++;
+        tmp = tmp->next;
     }
-    target_pile->length = temp_length;
+    source_pile->length = count;
+
+    count = 0;
+    tmp = target_pile->head;
+    while (tmp != NULL) {
+        count++;
+        tmp = tmp->next;
+    }
+    target_pile->length = count;
 }
 
 //This function initializes the game piles with cards from the deck
