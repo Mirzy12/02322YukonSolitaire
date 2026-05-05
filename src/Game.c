@@ -903,12 +903,12 @@ int main(int argc, char *argv[]) {
                 }
             } else if (input[0] == 'C') {
                 sourceColumn = input[1] - '0' - 1;
-                if (input[3] == 'C') {
-                    targetColumn = input[4] - '0' - 1;
+                if (input[4] == 'C') {
+                    targetColumn = input[5] - '0' - 1;
                     moveCard(head_of_pile, sourceColumn, targetColumn);
                     strcpy(Message, "Move complete.");
-                } else if (input[3] == 'F') {
-                    int foundationIndex = input[4] - '1';
+                } else if (input[4] == 'F') {
+                    int foundationIndex = input[5] - '1';
                     Foundation[foundationIndex] = moveCardToFoundation(head_of_pile, sourceColumn);
                     strcpy(Message, "Moved to foundation.");
                 } else {
@@ -924,6 +924,10 @@ int main(int argc, char *argv[]) {
             }
         } else {
             strcpy(Message, "Invalid command.");
+        }
+
+        if (current_phase == Play) {
+            displayCardPiles(head_of_pile, Foundation);
         }
     }
 
