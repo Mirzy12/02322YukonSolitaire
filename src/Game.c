@@ -71,6 +71,9 @@ void attachCardToDeck(deck *deck, card *new_card) {
     deck->size += 1;
 }
 
+bool isValidMove(card *moving, card *target) {
+    
+}
 
 // Function to create a new deck of cards
 void LD_default(deck *newDeck) {
