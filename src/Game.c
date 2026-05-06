@@ -471,6 +471,12 @@ void moveSpecificCard(pile *head, int source_column, int target_column, char val
         return;
     }
 
+    // Prevent from moving to same pile
+    if (source_pile == target_pile) {
+        printf("Cannot move within same pile\n");
+        return;
+    }
+
     // find the card in source
     node *source_card = source_pile->head;
     while (source_card != NULL) {
@@ -486,6 +492,20 @@ void moveSpecificCard(pile *head, int source_column, int target_column, char val
         return;
     }
 
+    // Prevent from moving hidden cards
+    if (!source_card->assigned_card->cardVisible) {
+        printf("Cannot move hidden card.\n");
+        return;
+    }
+
+    // Validate moving specific cards
+    card *target_card = target_pile->tail ? target_pile->tail->assigned_card : NULL;
+
+    if (!isValidMove(source_card->assigned_card, target_card)) {
+        printf("Invalid move.\n");
+        return;
+    }
+
     //  SPLIT LIST
     node *before = source_card->prev;
 
@@ -493,7 +513,7 @@ void moveSpecificCard(pile *head, int source_column, int target_column, char val
         before->next = NULL;
         source_pile->tail = before;
     } else {
-        // moving whole pile
+        // moving entire pile
         source_pile->head = NULL;
         source_pile->tail = NULL;
     }
@@ -502,27 +522,24 @@ void moveSpecificCard(pile *head, int source_column, int target_column, char val
 
     // APPEND TO TARGET
     if (target_pile->head == NULL) {
+        // empty pile
         target_pile->head = source_card;
         target_pile->tail = source_card;
-
-        // find new tail
-        node *temp = source_card;
-        while (temp->next != NULL) temp = temp->next;
-        target_pile->tail = temp;
-
     } else {
         node *target_tail = target_pile->tail;
 
         target_tail->next = source_card;
         source_card->prev = target_tail;
-
-        // find new tail
-        node *temp = source_card;
-        while (temp->next != NULL) temp = temp->next;
-        target_pile->tail = temp;
     }
 
-    // FLIP CARD (important!)
+        // find new tail
+        node *new_tail = source_card;
+        while (new_tail->next != NULL) {
+            new_tail = new_tail->next;
+        }
+        target_pile->tail = new_tail;
+
+    // FLIP CARD
     if (source_pile->tail != NULL &&
         source_pile->tail->assigned_card->cardVisible == false) {
         source_pile->tail->assigned_card->cardVisible = true;
