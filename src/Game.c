@@ -360,8 +360,27 @@ void moveCard(pile *head, int source_column, int target_column) {
 
     // Find the last card in the source column
     node *source_card = current->tail;
-    while (source_card->next != NULL) {
-        source_card = source_card->next;
+    if (source_card == NULL) {
+        printf("Source column is empty.\n");
+    }
+   // while (source_card->next != NULL) {
+     //   source_card = source_card->next;
+    //}
+
+    // Find the target pile (before we remove a card)
+    pile *temp=head;
+    while (temp->id != target_column) {
+        temp=temp->next;
+    }
+    target_pile = temp;
+
+    // Get last card in target pile
+    card *target_card = target_pile->tail ? target_pile->tail->assigned_card : NULL;
+
+    // Validate the move
+    if (!isValidMove(source_card->assigned_card, target_card)) {
+        printf("Invalid move.\n");
+        return;
     }
 
     // Remove the card from the source column
@@ -370,19 +389,18 @@ void moveCard(pile *head, int source_column, int target_column) {
         current->head = NULL;
         current->tail = NULL;
     } else {
-        source_card->prev->next = NULL;
+        source_pile->tail = source_card->prev;
+        source_pile->tail->next = NULL;
         source_card->prev = NULL;
     }
-
-    current = head;
-    while(current->id != target_column) {
-        current = current->next;
+    //Flip the new top card in the source pile
+    if (source_pile->tail != NULL &&
+        source_pile->tail->assigned_card->cardVisible == false) {
+        source_pile->tail->assigned_card->cardVisible = true;
     }
-
-    target_pile = current;
-
     // Add the card to the end of the target column
-    if (target_pile->head == NULL && target_pile->tail == NULL) {
+    //if (target_pile->head == NULL && target_pile->tail == NULL)
+    if (target_pile->tail == NULL){
         // The target column is empty
         target_pile->head = source_card;
         target_pile->tail = source_card;
@@ -390,13 +408,11 @@ void moveCard(pile *head, int source_column, int target_column) {
     } else {
         // Find the last card in the target column
         node *target_tail = target_pile->tail;
-        while (target_tail->next != NULL) {
-            target_tail = target_tail->next;
-        }
 
         // Add the card to the end of the target column
         target_tail->next = source_card;
         source_card->prev = target_tail;
+        target_pile->tail = source_card;
     }
 
     node *current_node = source_pile->head;
