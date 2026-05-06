@@ -503,81 +503,71 @@ void moveSpecificCard(pile *head, int source_column, int target_column, char val
     target_pile->length = count;
 }
 
-//This function initializes the game piles with cards from the deck
+// This function initializes the game piles with cards from the deck
 pile *initializePiles(deck *Deck) {
-    int temp_length;
-    pile *current_pile = new_pile(); // create a new pile
-    pile *head_of_pile = current_pile; // initialize the head of the pile with the current pile
-    node *current_node;
 
-    card *current_card = Deck->head; // initialize the current card to the first card of the deck
+    // Number of cards in each column (Yukon rules)
+    int sizes[7] = {1, 6, 7, 8, 9, 10, 11};
 
-    //Loop through NUM_COLUMNS (7) times to fill in each pile with cards
-    for(int i = 0; i < NUM_COLUMNS; i++) {
-        current_pile->id = i; // assign a unique id to each pile
-        current_pile->head = new_node(current_card); // create a new node for each card
-        if(i != 0) {
-            current_card->cardVisible = false; // hide the card on the first pile
-        } else {
-            current_card->cardVisible = true;
+    pile *head = NULL;          // pointer to first pile
+    pile *prev_pile = NULL;     // pointer to previous pile
+
+    card *current_card = Deck->head; // start from first card in deck
+
+    // Loop through all columns (C1 to C7)
+    for (int i = 0; i < NUM_COLUMNS; i++) {
+
+        // Create a new pile
+        pile *p = new_pile();
+        p->id = i; // assign column id
+
+        // Set head of pile list
+        if (head == NULL) {
+            head = p;
         }
-        current_pile->length = 1; // set the initial length of each pile to 1
-        current_pile->tail = current_pile->head; // set the tail to the head of each pile
-        current_pile->next = new_pile(); // create a new pile for the next iteration
-        current_pile->next->prev = current_pile; // set the previous pointer of the next pile to the current pile
-        current_pile = current_pile->next; // set the current pile to the next pile
-        current_card = current_card->next; // set the current card to the next card
+
+        // Link piles together (double linked list)
+        if (prev_pile != NULL) {
+            prev_pile->next = p;
+            p->prev = prev_pile;
+        }
+
+        prev_pile = p;
+
+        // Add cards to this pile
+        for (int j = 0; j < sizes[i]; j++) {
+
+            // Create a node for current card
+            node *n = new_node(current_card);
+
+            // If pile is empty, set head and tail
+            if (p->head == NULL) {
+                p->head = n;
+                p->tail = n;
+            } else {
+                // Otherwise, append to end
+                p->tail->next = n;
+                n->prev = p->tail;
+                p->tail = n;
+            }
+
+            // Set visibility:
+            // All cards except the last one are hidden
+            if (j < sizes[i] - 1) {
+                current_card->cardVisible = false;
+            } else {
+                current_card->cardVisible = true;
+            }
+
+            // Move to next card in deck
+            current_card = current_card->next;
+
+            // Increase pile length
+            p->length++;
+        }
     }
 
-    current_pile = head_of_pile;
-
-    // Loop through remaining cards and add to the piles based on game rules
-    while(current_card != NULL) {
-        // If the current pile is the first pile and has only 1 card or if
-        // it has reached the maximum number of cards allowed, move to next pile
-        if(current_pile->id == 0) {
-            current_pile = head_of_pile;
-        }
-        if ((current_pile->id == 0 && current_pile->length == 1) ||
-            (current_pile->id == 1 && current_pile->length == 6) ||
-            (current_pile->id == 2 && current_pile->length == 7) ||
-            (current_pile->id == 3 && current_pile->length == 8) ||
-            (current_pile->id == 4 && current_pile->length == 9) ||
-            (current_pile->id == 5 && current_pile->length == 10) ||
-            (current_pile->id == 6 && current_pile->length == 11)
-                ) {
-            // Skip this pile and move to next pile
-            current_pile = current_pile->next;
-            continue;
-        }
-
-        // Add the current card to the current pile
-        current_node = new_node(current_card); // create a new node for the current card
-        current_node->prev = current_pile->tail; // set the previous pointer of the new node to the tail of the current pile
-        current_pile->tail->next = current_node; // set the next pointer of the tail of the current pile to the new node
-        current_pile->tail = current_node; // set the tail of the current pile to the new node
-        temp_length = current_pile->length; // increment the length of the current pile
-        current_pile->length = ++temp_length;
-
-        // Set visibility of card based on game rules
-        if((current_pile->id == 1 && current_pile->length <= 1) ||
-           (current_pile->id == 2 && current_pile->length <= 2) ||
-           (current_pile->id == 3 && current_pile->length <= 3) ||
-           (current_pile->id == 4 && current_pile->length <= 4) ||
-           (current_pile->id == 5 && current_pile->length <= 5) ||
-           (current_pile->id == 6 && current_pile->length <= 6)){
-            current_card->cardVisible = false;
-        } else {
-            current_card->cardVisible = true;
-        }
-
-        // Move to the next card and the next pile
-        current_card = current_card->next;
-        current_pile = current_pile->next;
-    }
-
-    // Return the head of the pile linked list
-    return head_of_pile;
+    return head; // return first pile
 }
 
 // Function to display the current state of the card piles and foundations
@@ -803,7 +793,7 @@ int main(int argc, char *argv[]) {
                 strcpy(Message, "You're already in PLAY phase.");
             } else {
                 head_of_pile = initializePiles(Deck);
-                displayCardPiles(head_of_pile, Foundation);
+                //displayCardPiles(head_of_pile, Foundation);
                 current_phase = Play;
                 strcpy(Message, "Game has started. You're now in the Play phase.");
             }
@@ -861,16 +851,17 @@ int main(int argc, char *argv[]) {
             printf("You've successfully quit the game. The program will now exit!\n");
             break;
         } else if (strstr(input, ":") != NULL && strstr(input, "->") != NULL) {
-            if (input[0] == 'C' && input[3] == ':' && input[6] == '-' && input[7] == '>') {
+            if (input[0] == 'C' && input[2] == ':' && input[5] == '-' && input[6] == '>') {
                 sourceColumn = input[1] - '0' - 1;
-                cardValue = input[4];
-                cardSuit = input[5];
-                if (input[8] == 'C') {
-                    targetColumn = input[9] - '0' - 1;
+                cardValue = input[3];
+                cardSuit = input[4];
+
+                if (input[7] == 'C') {
+                    targetColumn = input[8] - '0' - 1;
                     moveSpecificCard(head_of_pile, sourceColumn, targetColumn, cardValue, cardSuit);
                     strcpy(Message, "Card moved.");
-                } else if (input[8] == 'F') {
-                    int foundationIndex = input[9] - '1';
+                } else if (input[7] == 'F') {
+                    int foundationIndex = input[8] - '1';
                     Foundation[foundationIndex] = moveCardToFoundation(head_of_pile, sourceColumn);
                     strcpy(Message, "Moved to foundation.");
                 } else {
