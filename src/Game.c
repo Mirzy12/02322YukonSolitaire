@@ -80,6 +80,10 @@ bool isValidMove(card *moving, card *target) {
 
     }
 
+    // if same suit not allowed
+    if (moving->suit == target->suit) {
+        return false;
+    }
 }
 
 // Function to create a new deck of cards
