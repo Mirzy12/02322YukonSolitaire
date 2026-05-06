@@ -84,6 +84,19 @@ bool isValidMove(card *moving, card *target) {
     if (moving->suit == target->suit) {
         return false;
     }
+
+    // Check for ranking of cards
+    char order[] = "A23456789TJQK";
+
+    int moving_index = -1;
+    int target_index = -1;
+
+    for (int i = 0; i < 13; i++) {
+        if (order[i] == moving->value) moving_index = i;
+        if (order[i] == target->value) target_index = i;
+    }
+    // card moved has to be less than the targeted card
+    return (moving_index == target_index - 1);
 }
 
 // Function to create a new deck of cards
