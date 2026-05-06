@@ -72,7 +72,14 @@ void attachCardToDeck(deck *deck, card *new_card) {
 }
 
 bool isValidMove(card *moving, card *target) {
-    
+
+    // if target is NULL (empty column)
+    if (target == NULL) {
+        // only king is allowed on empty column
+        return (moving->value == 'K');
+
+    }
+
 }
 
 // Function to create a new deck of cards
