@@ -995,10 +995,36 @@ int main(int argc, char *argv[]) {
 
         else if (strstr(input, "->")) {
 
+            if (current_phase != Play) {
+                strcpy(Message, "Not allowed in STARTUP.");
+                continue;
+            }
+
             int s, t, f;
+            char v, suit;
+
+            // move specific card
+            if (sscanf(input, "C%d:%c%c->C%d", &s, &v, &suit, &t) ==4) {
+
+                sourceColumn = s - 1;
+                targetColumn = t - 1;
+
+                if (sourceColumn < 0 || sourceColumn >= NUM_COLUMNS|| targetColumn < 0 || targetColumn >= NUM_COLUMNS) {
+                    strcpy(Message, "Invalid column.");
+                    continue;
+                }
+
+                if (moveSpecificCard(head_of_pile, sourceColumn, targetColumn, v, suit)) {
+                    printf("Moved from %c%c from C%d to C%d\n", v, suit, s, t);
+                    strcpy(Message, "Card moved.");
+                }else {
+                    strcpy(Message, "Invalid card.");
+                }
+                continue;
+            }
 
             //  card move from column to column
-            if (sscanf(input, "C%d->C%d", &s, &t) == 2) {
+            else if (sscanf(input, "C%d->C%d", &s, &t) == 2) {
                 sourceColumn = s - 1;
                 targetColumn = t - 1;
                 if (sourceColumn < 0 || sourceColumn >= NUM_COLUMNS || targetColumn < 0 || targetColumn >= NUM_COLUMNS) {
