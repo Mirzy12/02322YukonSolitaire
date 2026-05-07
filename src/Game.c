@@ -845,17 +845,12 @@ void SaveDeckCards(pile *head_of_pile) {
 
 // This function checks if all piles in the linked list have an empty head node, indicating that the game has been won.
 
-bool checkWinState(pile *head, char *Message) {
-    pile *current = head;
+bool checkWinState(card *Foundation[], char *Message) {
 
-    // Check each pile for remaining cards
-    while(current != NULL) {
-        if(current->head != NULL) {
-            return false; // Not won yet
-        }
-        current = current->next;
+    for (int i = 0; i < 4; i++) {
+        if (Foundation[i] == NULL) return false;
+        if (Foundation[i]->value != 'k') return false;
     }
-
     // All piles are empty, player has won
     strcpy(Message, "You have won the game!");
     return true;
@@ -1109,8 +1104,13 @@ int main(int argc, char *argv[]) {
         else {
             strcpy(Message, "Invalid command.");
         }
+        //Check for win
+        if (current_phase == Play && checkWinState(Foundation, Message)) {
+            printf("Winner!\n");
+            break;
+        }
 
-        // DISPLAY
+        // Display of the game
         if (current_phase == Play) {
             printf("\n--- GAME STATE ---\n");
             displayCardPiles(head_of_pile, Foundation);
