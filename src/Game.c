@@ -854,20 +854,18 @@ void SaveDeckCards(pile *head_of_pile) {
 
 // This function checks if all piles in the linked list have an empty head node, indicating that the game has been won.
 
-bool checkWinState(card *Foundation[], char *Message) {
+bool checkWinState(card *Foundation[]) {
 
     for (int i = 0; i < 4; i++) {
         if (Foundation[i] == NULL || Foundation[i]->value != 'K')
             return false;
     }
     // All piles are empty, player has won
-    strcpy(Message, "You have won the game!");
     return true;
 }
 
 //This our main that run our Game.
 int main(int argc, char *argv[]) {
-
     card *Foundation[4];
     for (int i = 0; i < 4; i++) {
         Foundation[i] = NULL;
@@ -936,54 +934,31 @@ int main(int argc, char *argv[]) {
 
                 filename[strcspn(filename, "\n")] = 0;
 
-                if (strlen(filename) == 0) {
-                    free_deck((Deck));
-                    Deck = new_deck();
-                    LD_default(Deck);
+                deck *tempDeck;
 
-                    strcpy(Message, "OK");
+                if (strlen(filename) == 0) {
+                    tempDeck = LD(NULL); // uses default
                 } else {
                     //load from file
-                    deck *tempDeck = LD(filename);
-                    if (tempDeck == NULL) {
-                        strcpy(Message, "Error: invalid file.");
-                    }else {
-                        free_deck(Deck);
-                        Deck = tempDeck;
-                        strcpy(Message, "OK");
-                    }
+                    tempDeck = LD(filename);
                 }
-
-                deck *tempDeck = LD(filename);
                 if (tempDeck == NULL) {
-                    strcpy(Message, "Load failed.");
-                } else {
+                    strcpy(Message, "Error: invalid file.");
+                }else {
                     free_deck(Deck);
                     Deck = tempDeck;
-                    print_cards_in_deck(Deck);
                     strcpy(Message, "OK");
                 }
             }
         }
 
-            /*else {
-                deck *tempDeck = LD(LOADFILE);
-                if (tempDeck == NULL) {
-                    strcpy(Message, "Load failed.");
-                } else {
-                    Deck = tempDeck;
-                    print_cards_in_deck(Deck);
-                    strcpy(Message, "Deck loaded.");
-                }
-            }
-
-        }*/ else if (strcmp(input, "SW") == 0) {
+        else if (strcmp(input, "SW") == 0) {
 
             if (current_phase == Play) {
                 strcpy(Message, "Not allowed in PLAY.");
             } else {
                 showAllCards(Deck);
-                strcpy(Message, "Deck shown.");
+                strcpy(Message, "OK");
             }
 
         } else if (strcmp(input, "SI") == 0) {
@@ -993,7 +968,7 @@ int main(int argc, char *argv[]) {
             } else {
                 Deck = splitShuffle(Deck);
                 print_cards_in_deck(Deck);
-                strcpy(Message, "Split shuffled.");
+                strcpy(Message, "OK");
             }
 
         } else if (strcmp(input, "SR") == 0) {
@@ -1003,14 +978,14 @@ int main(int argc, char *argv[]) {
             } else {
                 Deck = randomshuffle_deck(Deck);
                 showAllCards(Deck);
-                strcpy(Message, "Random shuffled.");
+                strcpy(Message, "OK");
             }
 
         } else if (strcmp(input, "SD") == 0) {
 
             if (current_phase == Play) {
                 SaveDeckCards(head_of_pile);
-                strcpy(Message, "OK.");
+                strcpy(Message, "OK");
             } else {
                 strcpy(Message, "Not allowed.");
             }
@@ -1059,7 +1034,7 @@ int main(int argc, char *argv[]) {
 
                 if (moveCard(head_of_pile, sourceColumn, targetColumn)) {
                     printf("Moved from C%d to C%d\n", s, t);
-                        strcpy(Message, "Move complete.");
+                        strcpy(Message, "OK");
                 } else {
                     strcpy(Message, "Invalid move.");
                 }
@@ -1076,7 +1051,7 @@ int main(int argc, char *argv[]) {
 
                 if (moveCardToFoundation(head_of_pile, sourceColumn, foundationIndex, Foundation)) {
                     printf("Moved from C%d to F%d\n", s, f);
-                    strcpy(Message, "Moved to foundation.");
+                    strcpy(Message, "OK");
                 } else {
                     strcpy(Message, "Invalid move.");
                 }
@@ -1115,7 +1090,7 @@ int main(int argc, char *argv[]) {
                         }
                         targetPile->length++;
                         printf("Moved from F%d to C%d\n", f, t);
-                        strcpy(Message, "Moved from foundation");
+                        strcpy(Message, "OK");
                     }
                 }else {
                     strcpy(Message, "Foundation empty.");
@@ -1130,14 +1105,14 @@ int main(int argc, char *argv[]) {
             strcpy(Message, "Invalid command.");
         }
         //Check for win
-        if (current_phase == Play && checkWinState(Foundation, Message)) {
+        if (current_phase == Play && checkWinState(Foundation)) {
+            strcpy(Message, "You have won the game!");
             printf("Winner!\n");
             break;
         }
 
         // Display of the game
         if (current_phase == Play) {
-            printf("\n--- GAME STATE ---\n");
             displayCardPiles(head_of_pile, Foundation);
         }
     }
