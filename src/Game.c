@@ -13,7 +13,7 @@
 // If running on another machine, do update LOADFILE to the correct path.
 #define LOADFILE "/Users/Amira/CLionProjects/02322YukonSolitaire/cards.txt"
 #define NUM_COLUMNS 7
-
+const char order[] = "A23456789TJQK";
 typedef enum { StartUp, Play } Phase;
 // Function to create a new card and insert into linked list
 card *new_card(char suit, char value) {
@@ -86,7 +86,6 @@ bool isValidMove(card *moving, card *target) {
     }
 
     // Check for ranking of cards
-    char order[] = "A23456789TJQK";
 
     int moving_index = -1;
     int target_index = -1;
@@ -298,7 +297,23 @@ struct deck *randomshuffle_deck(struct deck *deck) {
     return deck;
 }
 
-card *moveCardToFoundation(pile *head, int source_column) {
+bool canMoveCardToFoundation(card *moving, card *top) {
+    if (top == NULL) {
+        return (moving->value == 'A');
+    }
+
+    if (moving->suit != top->suit) return false;
+
+    int m = -1, t = -1;
+    for (int i = 0; i < 13; i++) {
+        if (order[i] == moving->value) m=i;
+        if (order[i] == top->value) t=i;
+    }
+    if (m == -1 || t == -1) return false;
+
+    return (m == t +1);
+}
+card *moveCardToFoundation(pile *head, int source_column,int target_foundation, card *Foundation[]) {
     // Check that source_column and target_column are valid indices
     if (source_column < 0 || source_column >= NUM_COLUMNS) {
         printf("Invalid column indices.\n");
@@ -319,34 +334,59 @@ card *moveCardToFoundation(pile *head, int source_column) {
 
     // Find the last card in the source column
     node *source_tail = current->tail;
-    while (source_tail->next != NULL) {
-        source_tail = source_tail->next;
+
+    if (source_tail == NULL) {
+        printf("Source column is empty.\n");
+        return NULL;
     }
 
-    // Remove the card from the source column
+    card *moving =source_tail->assigned_card;
+
+    // Find the foundation index
+    int f = target_foundation;
+    if (f < 0 || f>=4) {
+        printf("Invalid foundation.\n");
+        return NULL;
+    }
+    card *top = Foundation[f];
+
+    //Check if it's a valid move to foundation
+    if (!canMoveCardToFoundation(moving, top)) {
+        printf("Invalid move.\n");
+        return NULL;
+    }
+
+    //Remove card from source column
     if (source_tail->prev == NULL) {
-        // The source column only had one card
         current->head = NULL;
         current->tail = NULL;
     } else {
-        source_tail->prev->next = NULL;
+        current->tail = source_tail->prev;
+        current->tail->next = NULL;
         source_tail->prev = NULL;
     }
+    current->length--;
 
-    return source_tail->assigned_card;
+
+    //Flip the next card
+    if (current->tail != NULL && !current->tail->assigned_card->cardVisible) {
+        current->tail->assigned_card->cardVisible = true;
+    }
+    Foundation[f] = moving;
+    return moving;
 }
 
-void moveCard(pile *head, int source_column, int target_column) {
+bool moveCard(pile *head, int source_column, int target_column) {
     // Check that source_column and target_column are valid indices
     if (source_column < 0 || source_column >= NUM_COLUMNS || target_column < 0 || target_column >= NUM_COLUMNS) {
         printf("Invalid column indices.\n");
-        return;
+        return false;
     }
 
     // Check that the source column is not empty
     if (head == NULL) {
         printf("Source column is empty.\n");
-        return;
+        return false;
     }
 
     pile *current = head;
@@ -362,6 +402,7 @@ void moveCard(pile *head, int source_column, int target_column) {
     node *source_card = current->tail;
     if (source_card == NULL) {
         printf("Source column is empty.\n");
+        return false;
     }
    // while (source_card->next != NULL) {
      //   source_card = source_card->next;
@@ -380,7 +421,7 @@ void moveCard(pile *head, int source_column, int target_column) {
     // Validate the move
     if (!isValidMove(source_card->assigned_card, target_card)) {
         printf("Invalid move.\n");
-        return;
+        return false;
     }
 
     // Remove the card from the source column
@@ -430,12 +471,14 @@ void moveCard(pile *head, int source_column, int target_column) {
         temp_length++;
     }
     target_pile->length = temp_length;
+
+    return true;
 }
 
-void moveSpecificCard(pile *head, int source_column, int target_column, char value, char suit) {
+bool moveSpecificCard(pile *head, int source_column, int target_column, char value, char suit) {
     if (source_column < 0 || source_column >= NUM_COLUMNS || target_column < 0 || target_column >= NUM_COLUMNS) {
         printf("Invalid column indices.\n");
-        return;
+        return false;
     }
 
     pile *current = head;
@@ -453,7 +496,7 @@ void moveSpecificCard(pile *head, int source_column, int target_column, char val
 
     if (source_pile == NULL || source_pile->head == NULL) {
         printf("ERROR: Source empty\n");
-        return;
+        return false;
     }
 
     // find target pile
@@ -468,13 +511,13 @@ void moveSpecificCard(pile *head, int source_column, int target_column, char val
 
     if (target_pile == NULL) {
         printf("ERROR: Target not found\n");
-        return;
+        return false;
     }
 
     // Prevent from moving to same pile
     if (source_pile == target_pile) {
         printf("Cannot move within same pile\n");
-        return;
+        return false;
     }
 
     // find the card in source
@@ -489,13 +532,13 @@ void moveSpecificCard(pile *head, int source_column, int target_column, char val
 
     if (source_card == NULL) {
         printf("ERROR: Card not found\n");
-        return;
+        return false;
     }
 
     // Prevent from moving hidden cards
     if (!source_card->assigned_card->cardVisible) {
         printf("Cannot move hidden card.\n");
-        return;
+        return false;
     }
 
     // Validate moving specific cards
@@ -503,7 +546,7 @@ void moveSpecificCard(pile *head, int source_column, int target_column, char val
 
     if (!isValidMove(source_card->assigned_card, target_card)) {
         printf("Invalid move.\n");
-        return;
+        return false;
     }
 
     //  SPLIT LIST
@@ -561,6 +604,8 @@ void moveSpecificCard(pile *head, int source_column, int target_column, char val
         tmp = tmp->next;
     }
     target_pile->length = count;
+
+    return true;
 }
 
 // This function initializes the game piles with cards from the deck
@@ -818,8 +863,9 @@ bool checkWinState(pile *head, char *Message) {
 
 //This our main that run our Game.
 int main(int argc, char *argv[]) {
-    card *Foundation[5];
-    for (int i = 0; i <= 4; i++) {
+
+    card *Foundation[4];
+    for (int i = 0; i < 4; i++) {
         Foundation[i] = NULL;
     }
 
@@ -831,14 +877,15 @@ int main(int argc, char *argv[]) {
 
     char LastCommand[100] = "";
     char Message[100] = "";
-    int sourceColumn;
-    int targetColumn;
-    char cardValue;
-    char cardSuit;
+    int sourceColumn, targetColumn;
+    char cardValue, cardSuit;
+
     Phase current_phase = StartUp;
 
     while (1) {
+
         char input[50];
+
         printf("LAST Command: %s\n", LastCommand);
         printf("Message: %s\n", Message);
         printf("INPUT> ");
@@ -846,138 +893,226 @@ int main(int argc, char *argv[]) {
 
         strcpy(LastCommand, input);
 
-        if (strcmp(input, " ") == 0) {
+        //  BASIC COMMANDS
 
-        } else if (strcmp(input, "P") == 0) {
+        if (strcmp(input, "P") == 0) {
+
             if (current_phase == Play) {
-                strcpy(Message, "You're already in PLAY phase.");
+                strcpy(Message, "Already in PLAY.");
             } else {
                 head_of_pile = initializePiles(Deck);
-                //displayCardPiles(head_of_pile, Foundation);
                 current_phase = Play;
-                strcpy(Message, "Game has started. You're now in the Play phase.");
+                strcpy(Message, "Game started.");
             }
+
         } else if (strcmp(input, "Q") == 0) {
-            if (current_phase == StartUp) {
-                strcpy(Message, "You're not in a game.");
-            } else {
-                current_phase = StartUp;
-                strcpy(Message, "Game quit. Now back in StartUp phase.");
-            }
-        } else if (strcmp(input, "LD") == 0) {
+
+            current_phase = StartUp;
+            strcpy(Message, "Game quit.");
+
+        } else if (strcmp(input, "QQ") == 0) {
+
+            printf("Exiting game...\n");
+            break;
+
+        }
+
+        //  DECK COMMANDS
+
+        else if (strcmp(input, "LD") == 0) {
+
             if (current_phase == Play) {
-                strcpy(Message, "Command not available in the Play phase.");
+                strcpy(Message, "Not allowed in PLAY.");
             } else {
                 deck *tempDeck = LD(LOADFILE);
                 if (tempDeck == NULL) {
-                    strcpy(Message, "Could not load deck.");
+                    strcpy(Message, "Load failed.");
                 } else {
                     Deck = tempDeck;
                     print_cards_in_deck(Deck);
-                    strcpy(Message, "Deck loaded from file.");
+                    strcpy(Message, "Deck loaded.");
                 }
             }
+
         } else if (strcmp(input, "SW") == 0) {
+
             if (current_phase == Play) {
-                strcpy(Message, "Command not available in the PLAY phase.");
+                strcpy(Message, "Not allowed in PLAY.");
             } else {
                 showAllCards(Deck);
                 strcpy(Message, "Deck shown.");
             }
+
         } else if (strcmp(input, "SI") == 0) {
+
             if (current_phase == Play) {
-                strcpy(Message, "Command not available in the PLAY phase.");
+                strcpy(Message, "Not allowed in PLAY.");
             } else {
                 Deck = splitShuffle(Deck);
                 print_cards_in_deck(Deck);
-                strcpy(Message, "Deck has been split shuffled.");
+                strcpy(Message, "Split shuffled.");
             }
+
         } else if (strcmp(input, "SR") == 0) {
+
             if (current_phase == Play) {
-                strcpy(Message, "Command not available in the PLAY phase.");
+                strcpy(Message, "Not allowed in PLAY.");
             } else {
                 Deck = randomshuffle_deck(Deck);
                 showAllCards(Deck);
-                strcpy(Message, "Deck has been randomly shuffled.");
+                strcpy(Message, "Random shuffled.");
             }
+
         } else if (strcmp(input, "SD") == 0) {
+
             if (current_phase == Play) {
                 SaveDeckCards(head_of_pile);
-                strcpy(Message, "Deck has been saved to file.");
+                strcpy(Message, "Saved.");
             } else {
-                strcpy(Message, "Command not available in the StartUp phase.");
+                strcpy(Message, "Not allowed.");
             }
-        } else if (strcmp(input, "QQ") == 0) {
-            printf("You've successfully quit the game. The program will now exit!\n");
-            break;
-        } else if (strstr(input, ":") != NULL && strstr(input, "->") != NULL) {
-            if (input[0] == 'C' && input[2] == ':' && input[5] == '-' && input[6] == '>') {
-                sourceColumn = input[1] - '0' - 1;
-                cardValue = input[3];
-                cardSuit = input[4];
+        }
 
-                if (input[7] == 'C') {
-                    targetColumn = input[8] - '0' - 1;
-                    moveSpecificCard(head_of_pile, sourceColumn, targetColumn, cardValue, cardSuit);
-                    strcpy(Message, "Card moved.");
-                } else if (input[7] == 'F') {
-                    int foundationIndex = input[8] - '1';
-                    Foundation[foundationIndex] = moveCardToFoundation(head_of_pile, sourceColumn);
-                    strcpy(Message, "Moved to foundation.");
-                } else {
-                    strcpy(Message, "Invalid target in move command.");
-                }
-            } else {
-                strcpy(Message, "Invalid move format.");
-            }
-        } else if (strstr(input, "->") != NULL) {
-            if (input[0] == 'F') {
-                int foundationIndex = input[1] - '1';
-                targetColumn = input[4] - '0' - 1;
-                if (Foundation[foundationIndex] != NULL) {
-                    card *movingCard = Foundation[foundationIndex];
-                    Foundation[foundationIndex] = NULL;
-                    node *newNode = new_node(movingCard);
-                    pile *targetPile = head_of_pile;
-                    for (int i = 0; i < targetColumn; i++) targetPile = targetPile->next;
-                    if (targetPile->tail) {
-                        targetPile->tail->next = newNode;
-                        newNode->prev = targetPile->tail;
-                        targetPile->tail = newNode;
-                    } else {
-                        targetPile->head = targetPile->tail = newNode;
+        // MOVE COMMANDS
+
+        else if (strstr(input, "->")) {
+
+            //  Specific card move
+            if (strstr(input, ":")) {
+
+                if (input[0] == 'C') {
+
+                    sourceColumn = input[1] - '0' - 1;
+                    cardValue = input[3];
+                    cardSuit = input[4];
+
+                    if (input[7] == 'C') {
+
+                        targetColumn = input[8] - '0' - 1;
+
+                        if (moveSpecificCard(head_of_pile, sourceColumn, targetColumn, cardValue, cardSuit)) {
+                            printf("Moved %c%c from C%d to C%d\n", cardValue, cardSuit, sourceColumn+1, targetColumn+1);
+                            strcpy(Message, "Card moved.");
+                        }else {
+                            strcpy(Message, "Invalid move.");
+                        }
+
+                    } else if (input[7] == 'F') {
+                        int foundationIndex = input[8] - '1';
+
+                        if (moveCardToFoundation(head_of_pile, sourceColumn,foundationIndex, Foundation) != NULL) {
+                            printf("Moved from C%d to F%d\n", sourceColumn+1, foundationIndex+1);
+                            strcpy(Message, "Moved to foundation.");
+                        } else {
+                            strcpy(Message, "Invalid move.");
+                        }
                     }
-                    targetPile->length++;
-                    strcpy(Message, "Card moved from foundation to column.");
-                } else {
-                    strcpy(Message, "Foundation is empty.");
                 }
-            } else if (input[0] == 'C') {
-                sourceColumn = input[1] - '0' - 1;
-                if (input[4] == 'C') {
-                    targetColumn = input[5] - '0' - 1;
-                    moveCard(head_of_pile, sourceColumn, targetColumn);
-                    strcpy(Message, "Move complete.");
-                } else if (input[4] == 'F') {
-                    int foundationIndex = input[5] - '1';
-                    Foundation[foundationIndex] = moveCardToFoundation(head_of_pile, sourceColumn);
-                    strcpy(Message, "Moved to foundation.");
-                } else {
-                    strcpy(Message, "Invalid destination.");
-                }
-            } else {
-                strcpy(Message, "Invalid move format.");
             }
 
+            else {
+
+                // F -> C
+                if (input[0] == 'F') {
+
+                    int foundationIndex = input[1] - '1';
+
+                    if (foundationIndex < 0 || foundationIndex >= 4) {
+                        strcpy(Message, "Invalid foundation.");
+                        continue;
+                    }
+
+                    targetColumn = input[4] - '0' - 1;
+
+                    //validate target column
+                    if (targetColumn < 0 || targetColumn >= NUM_COLUMNS) {
+                        strcpy(Message, "Invalid column.");
+                        continue;
+                    }
+
+                    if (Foundation[foundationIndex] != NULL) {
+
+                        printf("DEBUG: moving F%d to C%d\n", foundationIndex+1, targetColumn+1);
+
+                        card *movingCard = Foundation[foundationIndex];
+
+                        pile *targetPile = head_of_pile;
+                        for (int i = 0; i < targetColumn; i++) {
+                            targetPile = targetPile->next;
+                        }
+
+                        card *targetCard = targetPile->tail ? targetPile->tail->assigned_card : NULL;
+
+                        if (!isValidMove(movingCard, targetCard)) {
+                            strcpy(Message, "Invalid move.");
+                        } else {
+
+                            Foundation[foundationIndex] = NULL;
+
+                            node *newNode = new_node(movingCard);
+
+                            if (targetPile->tail) {
+                                targetPile->tail->next = newNode;
+                                newNode->prev = targetPile->tail;
+                                targetPile->tail = newNode;
+                            } else {
+                                targetPile->head = targetPile->tail = newNode;
+                            }
+
+                            targetPile->length++;
+                            printf("Moved from F%d to C%d\n", foundationIndex+1, targetColumn+1);
+                            strcpy(Message, "Moved from foundation.");
+                        }
+
+                    } else {
+                        strcpy(Message, "Foundation empty.");
+                    }
+                }
+
+                // C -> C or C -> F
+                else if (input[0] == 'C') {
+
+                    sourceColumn = input[1] - '0' - 1;
+
+                    if (input[4] == 'C') {
+
+                        targetColumn = input[5] - '0' - 1;
+
+                        if (moveCard(head_of_pile, sourceColumn, targetColumn)) {
+                            //test
+                            printf("Moved from C%d to C%d\n", sourceColumn+1, targetColumn+1);
+                            strcpy(Message, "Move complete.");
+                        }else {
+                            strcpy(Message, "Invalid move.");
+                        }
+                    }
+
+                    else if (input[4] == 'F') {
+                        int foundationIndex = input[5] - '1';
+
+                        if (moveCardToFoundation(head_of_pile, sourceColumn,foundationIndex, Foundation) !=NULL) {
+                            strcpy(Message, "Moved to foundation.");
+                        } else {
+                            strcpy(Message, "Invalid move.");
+                        }
+                    }
+                }
+            }
+
+            // Win check
             if (checkWinState(head_of_pile, Message)) {
                 printf("Winner!\n");
                 break;
             }
-        } else {
+        }
+
+        else {
             strcpy(Message, "Invalid command.");
         }
 
+        // DISPLAY
         if (current_phase == Play) {
+            printf("\n--- GAME STATE ---\n");
             displayCardPiles(head_of_pile, Foundation);
         }
     }
