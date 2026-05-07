@@ -924,6 +924,24 @@ int main(int argc, char *argv[]) {
             if (current_phase == Play) {
                 strcpy(Message, "Not allowed in PLAY.");
             } else {
+                char filename[100];
+
+                printf("Enter filename: ");
+                scanf("%s", filename);
+
+                deck *tempDeck = LD(filename);
+                if (tempDeck == NULL) {
+                    strcpy(Message, "Load failed.");
+                } else {
+                    free_deck(Deck);
+                    Deck = tempDeck;
+                    print_cards_in_deck(Deck);
+                    strcpy(Message, "Deck loaded.");
+                }
+            }
+        }
+
+            /*else {
                 deck *tempDeck = LD(LOADFILE);
                 if (tempDeck == NULL) {
                     strcpy(Message, "Load failed.");
@@ -934,7 +952,7 @@ int main(int argc, char *argv[]) {
                 }
             }
 
-        } else if (strcmp(input, "SW") == 0) {
+        }*/ else if (strcmp(input, "SW") == 0) {
 
             if (current_phase == Play) {
                 strcpy(Message, "Not allowed in PLAY.");

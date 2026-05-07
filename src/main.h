@@ -49,4 +49,5 @@ void attachCardToDeck(deck *deck, card *new_card);
 void LD_default(deck*);
 deck *new_deck();
 void save_deck(deck *deck, char *filename);
+extern const char order[];
 #endif //SOLITAIRE_MAIN_H

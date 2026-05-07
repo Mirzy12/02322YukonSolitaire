@@ -5,4 +5,5 @@
 #ifndef SOLITAIRE_LD_H
 #define SOLITAIRE_LD_H
 deck* LD(char* input);
+void free_deck(deck* deck);
 #endif //SOLITAIRE_LD_H
