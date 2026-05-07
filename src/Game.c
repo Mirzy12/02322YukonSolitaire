@@ -548,6 +548,15 @@ bool moveSpecificCard(pile *head, int source_column, int target_column, char val
         printf("Invalid move.\n");
         return false;
     }
+    //Check that cards underneath are visible before moving
+    node *temp = source_card;
+    while (temp != NULL) {
+        if (!temp->assigned_card->cardVisible) {
+            printf("Cannot move hidden stack. \n");
+            return false;
+        }
+        temp = temp->next;
+    }
 
     //  SPLIT LIST
     node *before = source_card->prev;
@@ -848,8 +857,8 @@ void SaveDeckCards(pile *head_of_pile) {
 bool checkWinState(card *Foundation[], char *Message) {
 
     for (int i = 0; i < 4; i++) {
-        if (Foundation[i] == NULL) return false;
-        if (Foundation[i]->value != 'k') return false;
+        if (Foundation[i] == NULL || Foundation[i]->value != 'K')
+            return false;
     }
     // All piles are empty, player has won
     strcpy(Message, "You have won the game!");
@@ -1093,11 +1102,6 @@ int main(int argc, char *argv[]) {
             }
             else {
                 strcpy(Message, "Invalid move format");
-            }
-            // Win check
-            if (checkWinState(head_of_pile, Message)) {
-                printf("Winner!\n");
-                break;
             }
         }
 
