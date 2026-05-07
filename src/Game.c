@@ -11,7 +11,6 @@
 #define NUM_SUITS 4
 #define NUM_VALUES 13
 // If running on another machine, do update LOADFILE to the correct path.
-#define LOADFILE "/Users/Amira/CLionProjects/02322YukonSolitaire/cards.txt"
 #define NUM_COLUMNS 7
 const char order[] = "A23456789TJQK";
 typedef enum { StartUp, Play } Phase;
@@ -921,29 +920,21 @@ int main(int argc, char *argv[]) {
 
         //  DECK COMMANDS
 
-        else if (strcmp(input, "LD") == 0) {
+        else if (strncmp(input, "LD", 2) == 0) {
 
             if (current_phase == Play) {
-                strcpy(Message, "Command not allowed in PLAY phase.");
+                strcpy(Message, "Command not allowed in PLAY.");
             } else {
                 char filename[100];
-
-                printf("Enter filename or press ENTER for default: ");
-                getchar();
-                fgets(filename, sizeof(filename), stdin);
-
-                filename[strcspn(filename, "\n")] = 0;
-
                 deck *tempDeck;
 
-                if (strlen(filename) == 0) {
-                    tempDeck = LD(NULL); // uses default
+                if (sscanf(input, "LD %s", filename) == 1) {
+                    tempDeck = LD(filename); // loads file
                 } else {
-                    //load from file
-                    tempDeck = LD(filename);
+                    tempDeck = LD(NULL);
                 }
                 if (tempDeck == NULL) {
-                    strcpy(Message, "Error: invalid file.");
+                    strcpy(Message, "Invalid file.");
                 }else {
                     free_deck(Deck);
                     Deck = tempDeck;
@@ -1016,7 +1007,7 @@ int main(int argc, char *argv[]) {
 
                 if (moveSpecificCard(head_of_pile, sourceColumn, targetColumn, v, suit)) {
                     printf("Moved from %c%c from C%d to C%d\n", v, suit, s, t);
-                    strcpy(Message, "OK.");
+                    strcpy(Message, "OK");
                 }else {
                     strcpy(Message, "Invalid card.");
                 }

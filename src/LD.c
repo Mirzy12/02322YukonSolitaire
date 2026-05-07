@@ -24,16 +24,17 @@ deck* LD(char* input) {
 
     // Use default, if there's no input
     if (input == NULL || strlen(input) == 0) {
-        printf("🔍 Using default path: ../cards.txt\n");
+        printf("🔍 Using default path: %s\n", LOADFILE);
 
-        FILE *test = fopen("../cards.txt", "r");
+        FILE *test = fopen(LOADFILE, "r");
         if (test == NULL) {
-            perror("Failed to open ../cards.txt");
+            perror("Failed to open default file");
             free_deck(deck);
             return NULL;
         }
         fclose(test);
-        LD_file(deck, "../cards.txt");
+
+        LD_file(deck, LOADFILE);
     } else {
         FILE *test = fopen(input, "r");
         if (test == NULL) {
