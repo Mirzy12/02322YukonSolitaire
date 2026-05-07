@@ -906,17 +906,17 @@ int main(int argc, char *argv[]) {
             } else {
                 head_of_pile = initializePiles(Deck);
                 current_phase = Play;
-                strcpy(Message, "Game started.");
+                strcpy(Message, "OK");
             }
 
         } else if (strcmp(input, "Q") == 0) {
 
             current_phase = StartUp;
-            strcpy(Message, "Game quit.");
+            strcpy(Message, "OK");
 
         } else if (strcmp(input, "QQ") == 0) {
 
-            printf("Exiting game...\n");
+            printf("OK");
             break;
 
         }
@@ -926,12 +926,33 @@ int main(int argc, char *argv[]) {
         else if (strcmp(input, "LD") == 0) {
 
             if (current_phase == Play) {
-                strcpy(Message, "Not allowed in PLAY.");
+                strcpy(Message, "Command not allowed in PLAY phase.");
             } else {
                 char filename[100];
 
-                printf("Enter filename: ");
-                scanf("%s", filename);
+                printf("Enter filename or press ENTER for default: ");
+                getchar();
+                fgets(filename, sizeof(filename), stdin);
+
+                filename[strcspn(filename, "\n")] = 0;
+
+                if (strlen(filename) == 0) {
+                    free_deck((Deck));
+                    Deck = new_deck();
+                    LD_default(Deck);
+
+                    strcpy(Message, "OK");
+                } else {
+                    //load from file
+                    deck *tempDeck = LD(filename);
+                    if (tempDeck == NULL) {
+                        strcpy(Message, "Error: invalid file.");
+                    }else {
+                        free_deck(Deck);
+                        Deck = tempDeck;
+                        strcpy(Message, "OK");
+                    }
+                }
 
                 deck *tempDeck = LD(filename);
                 if (tempDeck == NULL) {
@@ -940,7 +961,7 @@ int main(int argc, char *argv[]) {
                     free_deck(Deck);
                     Deck = tempDeck;
                     print_cards_in_deck(Deck);
-                    strcpy(Message, "Deck loaded.");
+                    strcpy(Message, "OK");
                 }
             }
         }
@@ -989,7 +1010,7 @@ int main(int argc, char *argv[]) {
 
             if (current_phase == Play) {
                 SaveDeckCards(head_of_pile);
-                strcpy(Message, "Saved.");
+                strcpy(Message, "OK.");
             } else {
                 strcpy(Message, "Not allowed.");
             }
@@ -1020,7 +1041,7 @@ int main(int argc, char *argv[]) {
 
                 if (moveSpecificCard(head_of_pile, sourceColumn, targetColumn, v, suit)) {
                     printf("Moved from %c%c from C%d to C%d\n", v, suit, s, t);
-                    strcpy(Message, "Card moved.");
+                    strcpy(Message, "OK.");
                 }else {
                     strcpy(Message, "Invalid card.");
                 }
