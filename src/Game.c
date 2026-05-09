@@ -208,7 +208,7 @@ void printInitialSetup() {
     puts("\n");
 }
 
-struct deck* splitShuffle(struct deck* deck) {
+struct deck* splitShuffle(struct deck* deck, int split) {
     // Allocate memory for the shuffled deck
     struct deck* shuffledDeck = malloc(sizeof(struct deck));
     shuffledDeck->head = NULL;
@@ -221,13 +221,20 @@ struct deck* splitShuffle(struct deck* deck) {
     struct card* current = deck->head;
 
     int i;
-    for (i = 0; i < deck->size / 2; i++) {
+    // split point
+    for (i = 0; i < split; i++) {
         current = current->next;
     }
     secondHalf = current;
 
-    // Interleave the cards from the two halves
-    for (i = 0; i < deck->size / 2; i++) {
+    // sizez of the two halves
+    int firstSize = split;
+    int secondSize = deck->size - split
+
+    // smallest half
+    int minSize = firstSize < secondSize ? firstSize : secondSize;
+    // Interleaving the card
+    for (i = 0; i < minSize; i++) {
         // Take the i-th card from the first half
         struct card* firstCard = firstHalf;
         int j;
@@ -243,10 +250,38 @@ struct deck* splitShuffle(struct deck* deck) {
 
         // Add the two cards to the shuffled deck
         struct card* newCard1 = new_card(firstCard->suit, firstCard->value);
+
         attachCardToDeck(shuffledDeck, newCard1);
 
         struct card* newCard2 = new_card(secondCard->suit, secondCard->value);
+
         attachCardToDeck(shuffledDeck, newCard2);
+    }
+    // addign the remaining cards from the first half
+    struct card* remaining = firstHalf;
+
+    for (i = 0; i < minSize; i++) {
+        remaining = remaining->next;
+    }
+
+    while (remaining != NULL && firstSize> secondSize) {
+        struct card* newCard = new_card(remaining->suit, remaining->value);
+
+        attachCardToDeck(shuffledDeck, newCard);
+        remaining = remaining->next;
+    }
+
+    // Add remaining cards from second half
+    remaining = secondHalf;
+    for (i = 0; i < minSize; i++) {
+        remaining = remaining->next;
+    }
+
+    while (remaining != NULL && secondSize > firstSize) {
+        struct card* newCard = new_card(remaining->suit, remaining->value);
+
+        attachCardToDeck(shuffledDeck, newCard);
+        remaining = remaining->next;
     }
 
     return shuffledDeck;
