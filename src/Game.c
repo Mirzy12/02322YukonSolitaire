@@ -786,7 +786,7 @@ void displayCardPiles(pile *head_of_pile, pile *Foundations[]) {
 // Print a newline character to separate the output from other text
     puts("\n");
 }
-// This function saves the cards in a deck to a file in a specific format
+// This function saves the cards in a deck
 void SaveDeckCards(deck *Deck) {
 
     FILE *stream = fopen(LOADFILE, "w");
@@ -802,88 +802,6 @@ void SaveDeckCards(deck *Deck) {
     }
     fclose(stream);
 }
-/*void SaveDeckCards(pile *head_of_pile) {
-    pile *current_pile = head_of_pile; // pointer to the current pile being processed
-
-    // Initialize some variables
-    int longest_pile = 0; // length of the longest pile of cards
-    int id_of_longest_pile = 0; // id of the pile with the most cards
-    int current_id = 0; // current pile id
-    int index = 0; // index used to keep track of the current card in the pile
-    node *current_card_in_pile[10]; // array of pointers to nodes, used to keep track of the current card in each pile
-
-
-    // Loop through all piles to find the longest one and populate the array of current cards in each pile
-    while(current_pile != NULL) {
-        current_card_in_pile[index] = current_pile->head; // store a pointer to the head node of the current pile
-        if(longest_pile <= current_pile->length) { // check if the current pile is longer than the longest pile so far
-            longest_pile = current_pile->length; // if it is, update the longest_pile variable
-            id_of_longest_pile = current_pile->id; // and store the id of the current pile as the id of the pile with the most cards
-        }
-        index += 1; // increment the index
-        current_pile = current_pile->next; // move to the next pile
-    }
-
-    // If the longest pile has less than 8 cards, set its length to 8
-    if(longest_pile < 8) {
-        longest_pile = 8;
-    }
-
-    // Open the file for writing
-    card *current_card;
-    FILE *stream;
-    stream = fopen(LOADFILE, "w");
-    fclose(stream);
-
-    // Re-open the file for appending
-    stream = fopen(LOADFILE, "a");
-    char newData[4];
-    bool notFirstLine = false;
-
-    // Loop through the cards in the deck
-    while(longest_pile != 0) {
-        // Get the card at the current position
-        if(current_card_in_pile[current_id] == NULL) { // if the current node is NULL, set the current card to NULL
-            current_card = NULL;
-        } else {
-            current_card = current_card_in_pile[current_id]->assigned_card; // otherwise, get the card assigned to the current node
-        }
-
-        // If there is a current card, save it to the file
-        if(current_card != NULL) {
-            newData[0] = current_card->value; // copy the card value to newData
-            newData[1] = current_card->suit; // copy the card suit to newData
-            if(notFirstLine) { // if this is not the first line of the file, add a newline character before writing the data
-                fprintf(stream, "\n");
-            }
-            notFirstLine = true; // set the notFirstLine flag to true
-            fwrite(newData, sizeof(char), strlen(newData), stream); // write the data to the file
-        }
-
-        // If the current pile is the longest pile, decrement longest_pile
-        if(id_of_longest_pile == current_id) {
-            longest_pile--;
-        }
-
-        // Move to the next card in the current pile
-        if(current_card_in_pile[current_id] == NULL){
-            current_card_in_pile[current_id] = NULL;
-        } else {
-            current_card_in_pile[current_id] = current_card_in_pile[current_id]->next;
-        }
-        //The code then checks whether the current_id is equal to 6, which is the maximum index for the current_card_in_pile array
-        if(current_id == 6) {
-            //Index is reset to 0 to start at the beginning of the array again.
-            current_id = 0;
-            //Index is incremented by 1 to move to the next pile in the array
-        } else {
-            current_id += 1;
-        }
-    }
-    //stream is closed
-    fclose(stream);
-}*/
-
 
 // This function checks if all piles in the linked list have an empty head node, indicating that the game has been won.
 
@@ -909,7 +827,7 @@ int main(int argc, char *argv[]) {
     LD_default(Deck);
 
     printInitalSetup();
-    pile *head_of_pile = initializePiles(Deck);
+    pile *head_of_pile = NULL;
 
     char LastCommand[100] = "";
     char Message[100] = "";
@@ -1025,6 +943,7 @@ int main(int argc, char *argv[]) {
 
             if (current_phase != Play) {
                 strcpy(Message, "Not allowed in STARTUP.");
+                continue;
             }
 
             int s, t, f;
@@ -1038,6 +957,7 @@ int main(int argc, char *argv[]) {
 
                 if (sourceColumn < 0 || sourceColumn >= NUM_COLUMNS|| targetColumn < 0 || targetColumn >= NUM_COLUMNS) {
                     strcpy(Message, "Invalid column.");
+                    continue;
                 }
 
                 if (moveSpecificCard(head_of_pile, sourceColumn, targetColumn, v, suit)) {
@@ -1054,6 +974,7 @@ int main(int argc, char *argv[]) {
                 targetColumn = t - 1;
                 if (sourceColumn < 0 || sourceColumn >= NUM_COLUMNS || targetColumn < 0 || targetColumn >= NUM_COLUMNS) {
                     strcpy(Message, "Invalid column.");
+                    continue;
                 }
 
                 if (moveCard(head_of_pile, sourceColumn, targetColumn)) {
@@ -1070,6 +991,7 @@ int main(int argc, char *argv[]) {
 
                 if (sourceColumn < 0 || sourceColumn >= NUM_COLUMNS || foundationIndex < 0 || foundationIndex >= 4) {
                     strcpy(Message, "Invalid move.");
+                    continue;
                 }
 
                 if (moveCardToFoundation(head_of_pile, sourceColumn, foundationIndex, Foundation)) {
@@ -1087,8 +1009,14 @@ int main(int argc, char *argv[]) {
                 targetColumn = t - 1;
                 if (foundationIndex < 0 || foundationIndex >= 4 || targetColumn < 0 || targetColumn >= NUM_COLUMNS) {
                     strcpy(Message, "Invalid move.");
+                    continue;
                 }
                 if (Foundation[foundationIndex] != NULL) {
+
+                    if (Foundation[foundationIndex]->tail == NULL) {
+                        strcpy(Message, "Foundation empty.");
+                        continue;
+                    }
 
                     node *foundationTop = Foundation[foundationIndex]->tail;
                     card *movingcard = foundationTop->assigned_card;
