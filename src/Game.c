@@ -194,7 +194,7 @@ void print_cards_in_deck(struct deck *deck) {
     puts("\n");
 }
 
-void printInitalSetup() {
+void printInitialSetup() {
     // Display the array of linked lists
     printf("C1\tC2\tC3\tC4\tC5\tC6\tC7\n");
     int index = 1;
@@ -826,7 +826,7 @@ int main(int argc, char *argv[]) {
     deck *Deck = new_deck();
     LD_default(Deck);
 
-    printInitalSetup();
+    printInitialSetup();
     pile *head_of_pile = NULL;
 
     char LastCommand[100] = "";
@@ -864,6 +864,16 @@ int main(int argc, char *argv[]) {
         } else if (strcmp(input, "Q") == 0) {
 
             current_phase = StartUp;
+
+            // reset the foundations
+            for (int i = 0; i < 4; i++) {
+                Foundation[i]->head = NULL;
+                Foundation[i]->tail = NULL;
+                Foundation[i]->length = 0;
+            }
+
+            // reset the table
+            head_of_pile = NULL;
             strcpy(Message, "OK");
 
         } else if (strcmp(input, "QQ") == 0) {
