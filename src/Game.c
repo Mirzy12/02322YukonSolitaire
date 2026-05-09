@@ -787,7 +787,22 @@ void displayCardPiles(pile *head_of_pile, pile *Foundations[]) {
     puts("\n");
 }
 // This function saves the cards in a deck to a file in a specific format
-void SaveDeckCards(pile *head_of_pile) {
+void SaveDeckCards(deck *Deck) {
+
+    FILE *stream = fopen(LOADFILE, "w");
+    if (stream == NULL) {
+        printf("Could not save deck.\n");
+        return;
+    }
+    card *current = Deck->head;
+
+    while (current != NULL) {
+    fprintf(stream, "%c%c\n", current->value, current->suit);
+    current = current->next;
+    }
+    fclose(stream);
+}
+/*void SaveDeckCards(pile *head_of_pile) {
     pile *current_pile = head_of_pile; // pointer to the current pile being processed
 
     // Initialize some variables
@@ -867,7 +882,7 @@ void SaveDeckCards(pile *head_of_pile) {
     }
     //stream is closed
     fclose(stream);
-}
+}*/
 
 
 // This function checks if all piles in the linked list have an empty head node, indicating that the game has been won.
@@ -996,8 +1011,8 @@ int main(int argc, char *argv[]) {
 
         } else if (strcmp(input, "SD") == 0) {
 
-            if (current_phase == Play) {
-                SaveDeckCards(head_of_pile);
+            if (current_phase == StartUp) {
+                SaveDeckCards(Deck);
                 strcpy(Message, "OK");
             } else {
                 strcpy(Message, "Not allowed.");
