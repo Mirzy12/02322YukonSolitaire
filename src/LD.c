@@ -23,7 +23,7 @@ deck* LD(char* input) {
     deck *deck = new_deck();
 
     // Use default, if there's no input
-    if (input == NULL || strlen(input) == 0) {
+    if (input == NULL || input[0] == '\0') {
         printf("🔍 Using default path: %s\n", LOADFILE);
 
         FILE *test = fopen(LOADFILE, "r");

@@ -69,6 +69,9 @@ void attachCardToDeck(deck *deck, card *new_card) {
     // increment the size of the deck and return the new card
     deck->size += 1;
 }
+bool isRedSuit(char suit) {
+    return (suit == 'H' || suit == 'D');
+}
 
 bool isValidMove(card *moving, card *target) {
 
@@ -78,9 +81,8 @@ bool isValidMove(card *moving, card *target) {
         return (moving->value == 'K');
 
     }
-
-    // if same suit not allowed
-    if (moving->suit == target->suit) {
+    // checks for color of suit
+    if (isRedSuit(moving->suit) == isRedSuit(target->suit)) {
         return false;
     }
 
@@ -312,7 +314,7 @@ bool canMoveCardToFoundation(card *moving, card *top) {
 
     return (m == t +1);
 }
-card *moveCardToFoundation(pile *head, int source_column,int target_foundation, card *Foundation[]) {
+card *moveCardToFoundation(pile *head, int source_column,int target_foundation, pile *Foundation[]) {
     // Check that source_column and target_column are valid indices
     if (source_column < 0 || source_column >= NUM_COLUMNS) {
         printf("Invalid column indices.\n");
@@ -347,7 +349,10 @@ card *moveCardToFoundation(pile *head, int source_column,int target_foundation, 
         printf("Invalid foundation.\n");
         return NULL;
     }
-    card *top = Foundation[f];
+    card *top = NULL;
+    if (Foundation[f]->tail != NULL) {
+        top = Foundation[f]->tail->assigned_card;
+    }
 
     //Check if it's a valid move to foundation
     if (!canMoveCardToFoundation(moving, top)) {
@@ -371,7 +376,20 @@ card *moveCardToFoundation(pile *head, int source_column,int target_foundation, 
     if (current->tail != NULL && !current->tail->assigned_card->cardVisible) {
         current->tail->assigned_card->cardVisible = true;
     }
-    Foundation[f] = moving;
+    //Foundation[f] = moving;
+    node *newNode = new_node(moving);
+
+    if (Foundation[f]->head == NULL) {
+
+        Foundation[f]->head = newNode;
+        Foundation[f]->tail = newNode;
+    } else {
+        Foundation[f]->tail->next = newNode;
+        newNode->prev = Foundation[f]->tail;
+        Foundation[f]->tail = newNode;
+    }
+    Foundation[f]->length++;
+
     return moving;
 }
 
@@ -684,7 +702,7 @@ pile *initializePiles(deck *Deck) {
 }
 
 // Function to display the current state of the card piles and foundations
-void displayCardPiles(pile *head_of_pile, card *Foundations[]) {
+void displayCardPiles(pile *head_of_pile, pile *Foundations[]) {
 // Initialize variables
     pile *current_pile = head_of_pile;
     int longest_pile = 0;
@@ -735,8 +753,9 @@ void displayCardPiles(pile *head_of_pile, card *Foundations[]) {
         // If the current card is the last card in a pile and it is a foundation pile, display the foundation
         if (current_id == 6) {
             if (foundations % 2 == 0 && index < 4) {
-                if(Foundations[index] != NULL) {
-                    printf("\t\t%c%c\tF%d", Foundations[index]->value, Foundations[index]->suit, index+1);
+                if(Foundations[index]->tail != NULL) {
+                    card *top = Foundations[index]->tail->assigned_card;
+                    printf("\t\t%c%c\tF%d", top->value, top->suit, index+1);
                 } else {
                     printf("\t\t[]\tF%d", index+1);
                 }
@@ -853,10 +872,10 @@ void SaveDeckCards(pile *head_of_pile) {
 
 // This function checks if all piles in the linked list have an empty head node, indicating that the game has been won.
 
-bool checkWinState(card *Foundation[]) {
+bool checkWinState(pile *Foundation[]) {
 
     for (int i = 0; i < 4; i++) {
-        if (Foundation[i] == NULL || Foundation[i]->value != 'K')
+        if (Foundation[i]->tail == NULL|| Foundation[i]->tail->assigned_card->value != 'K')
             return false;
     }
     // All piles are empty, player has won
@@ -865,9 +884,10 @@ bool checkWinState(card *Foundation[]) {
 
 //This our main that run our Game.
 int main(int argc, char *argv[]) {
-    card *Foundation[4];
+    pile *Foundation[4];
     for (int i = 0; i < 4; i++) {
-        Foundation[i] = NULL;
+        Foundation[i] = new_pile();
+        Foundation[i]->id = i;
     }
 
     deck *Deck = new_deck();
@@ -890,7 +910,9 @@ int main(int argc, char *argv[]) {
         printf("LAST Command: %s\n", LastCommand);
         printf("Message: %s\n", Message);
         printf("INPUT> ");
-        scanf("%s", input);
+        fgets(input, sizeof(input), stdin);
+        input[strcspn(input, "\n")] = 0;
+
 
         strcpy(LastCommand, input);
 
@@ -920,7 +942,7 @@ int main(int argc, char *argv[]) {
 
         //  DECK COMMANDS
 
-        else if (strncmp(input, "LD", 2) == 0) {
+        else if (strcmp(input, "LD") == 0 || strncmp(input, "LD ", 3) == 0){
 
             if (current_phase == Play) {
                 strcpy(Message, "Command not allowed in PLAY.");
@@ -988,7 +1010,6 @@ int main(int argc, char *argv[]) {
 
             if (current_phase != Play) {
                 strcpy(Message, "Not allowed in STARTUP.");
-                continue;
             }
 
             int s, t, f;
@@ -1002,7 +1023,6 @@ int main(int argc, char *argv[]) {
 
                 if (sourceColumn < 0 || sourceColumn >= NUM_COLUMNS|| targetColumn < 0 || targetColumn >= NUM_COLUMNS) {
                     strcpy(Message, "Invalid column.");
-                    continue;
                 }
 
                 if (moveSpecificCard(head_of_pile, sourceColumn, targetColumn, v, suit)) {
@@ -1011,7 +1031,6 @@ int main(int argc, char *argv[]) {
                 }else {
                     strcpy(Message, "Invalid card.");
                 }
-                continue;
             }
 
             //  card move from column to column
@@ -1020,7 +1039,6 @@ int main(int argc, char *argv[]) {
                 targetColumn = t - 1;
                 if (sourceColumn < 0 || sourceColumn >= NUM_COLUMNS || targetColumn < 0 || targetColumn >= NUM_COLUMNS) {
                     strcpy(Message, "Invalid column.");
-                    continue;
                 }
 
                 if (moveCard(head_of_pile, sourceColumn, targetColumn)) {
@@ -1037,7 +1055,6 @@ int main(int argc, char *argv[]) {
 
                 if (sourceColumn < 0 || sourceColumn >= NUM_COLUMNS || foundationIndex < 0 || foundationIndex >= 4) {
                     strcpy(Message, "Invalid move.");
-                    continue;
                 }
 
                 if (moveCardToFoundation(head_of_pile, sourceColumn, foundationIndex, Foundation)) {
@@ -1055,10 +1072,11 @@ int main(int argc, char *argv[]) {
                 targetColumn = t - 1;
                 if (foundationIndex < 0 || foundationIndex >= 4 || targetColumn < 0 || targetColumn >= NUM_COLUMNS) {
                     strcpy(Message, "Invalid move.");
-                    continue;
                 }
                 if (Foundation[foundationIndex] != NULL) {
-                    card *movingcard = Foundation[foundationIndex];
+
+                    node *foundationTop = Foundation[foundationIndex]->tail;
+                    card *movingcard = foundationTop->assigned_card;
 
                     pile *targetPile = head_of_pile;
                     for (int i = 0; i < targetColumn; i++) {
@@ -1069,15 +1087,26 @@ int main(int argc, char *argv[]) {
                         strcpy(Message, "Invalid move.");
                     }else {
 
-                        Foundation[foundationIndex] = NULL;
-
-                        node *newNode = new_node(movingcard);
-                        if (targetPile->tail) {
-                            targetPile->tail->next = newNode;
-                            newNode->prev = targetPile->tail;
-                            targetPile->tail = newNode;
+                        if (foundationTop->prev == NULL) {
+                            Foundation[foundationIndex]->head = NULL;
+                            Foundation[foundationIndex]->tail = NULL;
                         }else {
-                            targetPile->head = targetPile->tail = newNode;
+                            Foundation[foundationIndex]->tail=foundationTop->prev;
+                            Foundation[foundationIndex]->tail->next=NULL;
+                        }
+                        Foundation[foundationIndex]->length--;
+
+                        foundationTop->prev = NULL;
+                        foundationTop->next = NULL;
+
+                        if (targetPile->tail != NULL) {
+                            targetPile->tail->next = foundationTop;
+                            foundationTop->prev = targetPile->tail;
+                            targetPile->tail = foundationTop;
+                        }else {
+
+                            targetPile->head = foundationTop;
+                            targetPile->tail = foundationTop;
                         }
                         targetPile->length++;
                         printf("Moved from F%d to C%d\n", f, t);
