@@ -229,7 +229,7 @@ struct deck* splitShuffle(struct deck* deck, int split) {
 
     // sizez of the two halves
     int firstSize = split;
-    int secondSize = deck->size - split
+    int secondSize = deck->size - split;
 
     // smallest half
     int minSize = firstSize < secondSize ? firstSize : secondSize;
@@ -952,12 +952,24 @@ int main(int argc, char *argv[]) {
                 strcpy(Message, "OK");
             }
 
-        } else if (strcmp(input, "SI") == 0) {
+        } else if (strcmp(input, "SI") == 0 || strncmp(input, "SI ", 3) == 0) {
 
             if (current_phase == Play) {
                 strcpy(Message, "Not allowed in PLAY.");
             } else {
-                Deck = splitShuffle(Deck);
+                int split;
+
+                // random split
+                if (sscanf(input, "SI %d", &split) == 1) {
+                    split = rand() % 51 + 1;
+                }
+                // validate split
+                if (split < 0 || split > 51) {
+                    strcpy(Message, "Invalid split.");
+                    continue;
+                }
+                Deck = splitShuffle(Deck, split);
+
                 print_cards_in_deck(Deck);
                 strcpy(Message, "OK");
             }
