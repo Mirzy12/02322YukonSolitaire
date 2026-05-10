@@ -219,31 +219,40 @@ struct deck* splitShuffle(struct deck* deck, int split) {
     struct card* firstHalf = deck->head;
     struct card* secondHalf = NULL;
     struct card* current = deck->head;
+    struct card* prev = NULL;
 
     int i;
     // split point
     for (i = 0; i < split; i++) {
+        prev = current;
         current = current->next;
     }
     secondHalf = current;
 
-    // sizez of the two halves
+    // splitting the linked list
+    if (prev != NULL) {
+        prev->next = NULL;
+    }
+
+    // sizes of the two halves
     int firstSize = split;
     int secondSize = deck->size - split;
 
     // smallest half
     int minSize = firstSize < secondSize ? firstSize : secondSize;
+
     // Interleaving the card
     for (i = 0; i < minSize; i++) {
         // Take the i-th card from the first half
         struct card* firstCard = firstHalf;
+        // Take the i-th card from the second half
+        struct card* secondCard = secondHalf;
+
         int j;
         for (j = 0; j < i; j++) {
             firstCard = firstCard->next;
         }
 
-        // Take the i-th card from the second half
-        struct card* secondCard = secondHalf;
         for (j = 0; j < i; j++) {
             secondCard = secondCard->next;
         }
@@ -257,7 +266,7 @@ struct deck* splitShuffle(struct deck* deck, int split) {
 
         attachCardToDeck(shuffledDeck, newCard2);
     }
-    // addign the remaining cards from the first half
+    // adding the remaining cards from the first half
     struct card* remaining = firstHalf;
 
     for (i = 0; i < minSize; i++) {
@@ -960,15 +969,17 @@ int main(int argc, char *argv[]) {
                 int split;
 
                 // random split
-                if (sscanf(input, "SI %d", &split) == 1) {
+                if (sscanf(input, "SI %d", &split) != 1) {
                     split = rand() % 51 + 1;
                 }
                 // validate split
-                if (split < 0 || split > 51) {
+                if (split < 1 || split > 51) {
                     strcpy(Message, "Invalid split.");
                     continue;
                 }
+                deck *oldDeck = Deck;
                 Deck = splitShuffle(Deck, split);
+                free_deck(oldDeck);
 
                 print_cards_in_deck(Deck);
                 strcpy(Message, "OK");
@@ -1136,6 +1147,6 @@ int main(int argc, char *argv[]) {
             displayCardPiles(head_of_pile, Foundation);
         }
     }
-
+    free_deck(Deck);
     return 0;
 }
