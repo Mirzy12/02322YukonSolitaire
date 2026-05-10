@@ -62,10 +62,10 @@ void attachCardToDeck(deck *deck, card *new_card) {
         deck->tail = new_card;
     } else {
         // otherwise, add the new card to the end of the deck
+        new_card->prev = deck->tail;
         deck->tail->next = new_card;
         deck->tail = new_card;
     }
-
     // increment the size of the deck and return the new card
     deck->size += 1;
 }
@@ -210,7 +210,7 @@ void printInitialSetup() {
 
 struct deck* splitShuffle(struct deck* deck, int split) {
     // Allocate memory for the shuffled deck
-    struct deck* shuffledDeck = malloc(sizeof(struct deck));
+    struct deck* shuffledDeck = new_deck();
     shuffledDeck->head = NULL;
     shuffledDeck->tail = NULL;
     shuffledDeck->size = 0;
