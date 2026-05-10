@@ -3,4 +3,4 @@ project(Solitaire C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(Solitaire src/Game.c src/LD.c src/LD.h src/main.h)
+add_executable(Solitaire source/src/Game.c source/src/LD.c source/src/LD.h source/src/main.h)
