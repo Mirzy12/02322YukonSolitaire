@@ -4,8 +4,8 @@
 
 #ifndef SOLITAIRE_MAIN_H
 #define SOLITAIRE_MAIN_H
-//#define LOADFILE "cards.txt"
-#define LOADFILE "/Users/Amira/CLionProjects/02322YukonSolitaire/cards.txt"
+#define LOADFILE "cards.txt"
+//#define LOADFILE "/Users/Amira/CLionProjects/02322YukonSolitaire/cards.txt"
 
 #include <stdbool.h>
 #include <stdio.h>

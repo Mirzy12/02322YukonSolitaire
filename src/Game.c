@@ -620,6 +620,7 @@ bool moveSpecificCard(pile *head, int source_column, int target_column, char val
     }
 
     //  SPLIT LIST
+
     node *before = source_card->prev;
 
     if (before != NULL) {
