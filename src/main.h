@@ -4,6 +4,7 @@
 
 #ifndef SOLITAIRE_MAIN_H
 #define SOLITAIRE_MAIN_H
+#define LOADFILE "/Users/Amira/CLionProjects/02322YukonSolitaire/cards.txt"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -49,4 +50,5 @@ void attachCardToDeck(deck *deck, card *new_card);
 void LD_default(deck*);
 deck *new_deck();
 void save_deck(deck *deck, char *filename);
+extern const char order[];
 #endif //SOLITAIRE_MAIN_H

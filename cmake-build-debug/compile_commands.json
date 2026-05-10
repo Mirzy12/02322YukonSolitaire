@@ -1,0 +1,14 @@
+[
+{
+  "directory": "/Users/Amira/CLionProjects/02322YukonSolitaire/cmake-build-debug",
+  "command": "/usr/bin/cc -g -std=gnu11 -arch arm64 -fcolor-diagnostics -o CMakeFiles/Solitaire.dir/src/Game.c.o -c /Users/Amira/CLionProjects/02322YukonSolitaire/src/Game.c",
+  "file": "/Users/Amira/CLionProjects/02322YukonSolitaire/src/Game.c",
+  "output": "/Users/Amira/CLionProjects/02322YukonSolitaire/cmake-build-debug/CMakeFiles/Solitaire.dir/src/Game.c.o"
+},
+{
+  "directory": "/Users/Amira/CLionProjects/02322YukonSolitaire/cmake-build-debug",
+  "command": "/usr/bin/cc -g -std=gnu11 -arch arm64 -fcolor-diagnostics -o CMakeFiles/Solitaire.dir/src/LD.c.o -c /Users/Amira/CLionProjects/02322YukonSolitaire/src/LD.c",
+  "file": "/Users/Amira/CLionProjects/02322YukonSolitaire/src/LD.c",
+  "output": "/Users/Amira/CLionProjects/02322YukonSolitaire/cmake-build-debug/CMakeFiles/Solitaire.dir/src/LD.c.o"
+}
+]
